@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const QUICK = [
   { href: "/matchs", icon: "⚽", title: "Matchs", desc: "Pronostique les scores" },
-  { href: "/poules", icon: "📊", title: "Poules", desc: "Qualifiés de groupe" },
+  { href: "/poules", icon: "📊", title: "Groupes", desc: "Qualifiés de groupe" },
   { href: "/finale", icon: "🏆", title: "Finale", desc: "Vainqueur & finaliste" },
   { href: "/classement", icon: "🥇", title: "Classement", desc: "Le duel entre amis" },
 ];

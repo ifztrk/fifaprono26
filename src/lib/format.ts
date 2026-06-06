@@ -1,5 +1,5 @@
 export const STAGE_LABELS: Record<string, string> = {
-  GROUP: "Phase de poules",
+  GROUP: "Phase de groupes",
   R32: "16es de finale",
   R16: "8es de finale",
   QF: "Quarts de finale",

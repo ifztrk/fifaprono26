@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const LINKS = [
   { href: "/accueil", label: "Accueil", icon: "🏠" },
   { href: "/matchs", label: "Matchs", icon: "⚽" },
-  { href: "/poules", label: "Poules", icon: "📊" },
+  { href: "/poules", label: "Groupes", icon: "📊" },
   { href: "/finale", label: "Finale", icon: "🏆" },
   { href: "/classement", label: "Classement", icon: "🥇" },
 ];

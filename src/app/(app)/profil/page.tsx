@@ -63,7 +63,7 @@ export default async function ProfilPage() {
             <span className="font-semibold">{me?.matchPoints ?? 0} pts</span>
           </li>
           <li className="flex justify-between">
-            <span className="text-muted">📊 Qualifiés de poule</span>
+            <span className="text-muted">📊 Qualifiés de groupe</span>
             <span className="font-semibold">{me?.groupPoints ?? 0} pts</span>
           </li>
           <li className="flex justify-between">

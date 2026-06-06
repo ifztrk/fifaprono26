@@ -17,7 +17,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "FIFAPRONO 26 ⚽",
   description:
-    "Pronostics entre amis pour la Coupe du Monde 2026 — scores, qualifiés de poule et vainqueur final.",
+    "Pronostics entre amis pour la Coupe du Monde 2026 — scores, qualifiés de groupe et vainqueur final.",
 };
 
 export const viewport: Viewport = {

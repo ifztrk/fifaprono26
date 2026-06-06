@@ -24,7 +24,7 @@ export default async function PoulesPage() {
     return (
       <div className="card text-center">
         <p className="text-4xl">📊</p>
-        <h1 className="mt-2 text-xl font-bold">Poules non configurées</h1>
+        <h1 className="mt-2 text-xl font-bold">Groupes non configurés</h1>
         <p className="mt-1 text-muted">
           Les groupes apparaîtront ici une fois le tirage saisi par
           l&apos;administrateur.
@@ -39,7 +39,7 @@ export default async function PoulesPage() {
   return (
     <form action={saveGroupPredictionsAction}>
       <div className="mb-4">
-        <h1 className="display text-2xl font-extrabold">Poules & qualifiés 📊</h1>
+        <h1 className="display text-2xl font-extrabold">Groupes & qualifiés 📊</h1>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
           <span className="chip">🥇🥈 2 qualifiés / groupe</span>
           <span className="chip">+2 pts par bonne équipe</span>
