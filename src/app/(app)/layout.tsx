@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
-import { logoutAction } from "../(auth)/actions";
 import ThemeToggle from "@/components/ThemeToggle";
 import TeamFlag from "@/components/TeamFlag";
 import Nav, { DesktopNav } from "./Nav";
@@ -40,15 +39,6 @@ export default async function AppLayout({
                 {user.displayName}
               </span>
             </Link>
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                aria-label="Déconnexion"
-                className="grid size-8 place-items-center rounded-full border border-border text-muted transition hover:text-danger"
-              >
-                ⎋
-              </button>
-            </form>
           </div>
         </div>
       </header>
