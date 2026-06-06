@@ -125,4 +125,37 @@ export async function recomputeAllPoints(): Promise<void> {
       }
     }
   });
+
+  // 4) Instantané quotidien des totaux (pour le graphique d'évolution)
+  await snapshotTotals();
+}
+
+// Enregistre/met à jour le total de points de chaque joueur pour le jour courant
+async function snapshotTotals(): Promise<void> {
+  const day = new Intl.DateTimeFormat("fr-CA", {
+    timeZone: "Europe/Paris",
+  }).format(new Date());
+
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      matchPredictions: { select: { points: true } },
+      groupPredictions: { select: { points: true } },
+      longPrediction: { select: { points: true } },
+    },
+  });
+
+  await prisma.$transaction(
+    users.map((u) => {
+      const total =
+        u.matchPredictions.reduce((s, p) => s + p.points, 0) +
+        u.groupPredictions.reduce((s, p) => s + p.points, 0) +
+        (u.longPrediction?.points ?? 0);
+      return prisma.rankSnapshot.upsert({
+        where: { userId_day: { userId: u.id, day } },
+        update: { points: total },
+        create: { userId: u.id, day, points: total },
+      });
+    }),
+  );
 }

@@ -1,14 +1,71 @@
 import { getCurrentUser } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/leaderboard";
+import { prisma } from "@/lib/prisma";
+import { teamColor } from "@/lib/teamColors";
 import TeamFlag from "@/components/TeamFlag";
+import EvolutionChart from "./EvolutionChart";
 
 export const dynamic = "force-dynamic";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 
+type ChartData = {
+  dayLabels: string[];
+  maxRank: number;
+  series: { name: string; color: string; ranks: (number | null)[] }[];
+};
+
+async function buildChart(): Promise<ChartData | null> {
+  const snaps = await prisma.rankSnapshot.findMany({
+    orderBy: { day: "asc" },
+    include: { user: { select: { displayName: true, favoriteCode: true } } },
+  });
+  if (snaps.length === 0) return null;
+
+  const days = [...new Set(snaps.map((s) => s.day))].sort();
+  if (days.length < 2) return null;
+
+  // points[userId][day] = total
+  const users = new Map<
+    string,
+    { name: string; favoriteCode: string | null; pts: Record<string, number> }
+  >();
+  for (const s of snaps) {
+    if (!users.has(s.userId))
+      users.set(s.userId, {
+        name: s.user.displayName,
+        favoriteCode: s.user.favoriteCode,
+        pts: {},
+      });
+    users.get(s.userId)!.pts[s.day] = s.points;
+  }
+
+  // Rang par jour (à points égaux, même rang)
+  const rankByDay: Record<string, Record<string, number>> = {};
+  for (const day of days) {
+    const present = [...users.entries()].filter(([, u]) => day in u.pts);
+    present.sort((a, b) => b[1].pts[day] - a[1].pts[day]);
+    rankByDay[day] = {};
+    present.forEach(([id], idx) => (rankByDay[day][id] = idx + 1));
+  }
+
+  const series = [...users.entries()].map(([id, u]) => ({
+    name: u.name,
+    color: teamColor(u.favoriteCode),
+    ranks: days.map((d) => rankByDay[d][id] ?? null),
+  }));
+
+  const dayLabels = days.map((d) => {
+    const [, m, j] = d.split("-");
+    return `${j}/${m}`;
+  });
+
+  return { dayLabels, series, maxRank: users.size };
+}
+
 export default async function ClassementPage() {
   const user = (await getCurrentUser())!;
-  const rows = await getLeaderboard();
+  const [rows, chart] = await Promise.all([getLeaderboard(), buildChart()]);
 
   return (
     <div>
@@ -19,6 +76,19 @@ export default async function ClassementPage() {
           {rows.length > 1 ? "s" : ""} en lice.
         </p>
       </div>
+
+      {chart && (
+        <div className="card mb-4">
+          <h2 className="display mb-2 text-base font-bold">
+            📈 Évolution des places
+          </h2>
+          <EvolutionChart
+            dayLabels={chart.dayLabels}
+            series={chart.series}
+            maxRank={chart.maxRank}
+          />
+        </div>
+      )}
 
       <div className="space-y-2">
         {rows.map((r, i) => {
