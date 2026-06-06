@@ -1,4 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import {
+  GROUP_FIXTURES,
+  KNOCKOUT_SLOTS,
+  kickoffFromBst,
+} from "./schedule2026";
 
 const prisma = new PrismaClient();
 
@@ -185,6 +190,32 @@ async function main() {
         homeLabel: "À déterminer",
         awayLabel: "À déterminer",
       });
+    }
+  }
+
+  // Remplace les horaires algorithmiques par le calendrier OFFICIEL.
+  // Poule : appariement par paire d'équipes (codes). Phase finale : par ordre.
+  const codeById = new Map(
+    [...teamIdByCode.entries()].map(([code, id]) => [id, code]),
+  );
+  const pairKey = (a: string, b: string) => [a, b].sort().join("|");
+  const fixtureByPair = new Map(
+    GROUP_FIXTURES.map((f) => [pairKey(f.home, f.away), f]),
+  );
+  const koIdx: Record<string, number> = {};
+  for (const m of matchData) {
+    if (m.stage === "GROUP" && m.homeTeamId && m.awayTeamId) {
+      const f = fixtureByPair.get(
+        pairKey(codeById.get(m.homeTeamId)!, codeById.get(m.awayTeamId)!),
+      );
+      if (f) m.kickoff = kickoffFromBst(f.date, f.time);
+    } else {
+      const i = koIdx[m.stage] ?? 0;
+      const slot = KNOCKOUT_SLOTS.filter((s) => s.stage === m.stage)[i];
+      if (slot) {
+        m.kickoff = kickoffFromBst(slot.date, slot.time);
+        koIdx[m.stage] = i + 1;
+      }
     }
   }
 
