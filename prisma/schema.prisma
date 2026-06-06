@@ -1,0 +1,106 @@
+// Schéma de base de données — FIFAPRONO26
+// Application de pronostics Coupe du Monde 2026
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String
+  favoriteCode String? // code pays alpha-2 du "coup de cœur"
+  isAdmin      Boolean  @default(false)
+  onboarded    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  matchPredictions MatchPrediction[]
+  groupPredictions GroupPrediction[]
+  longPrediction   LongPrediction?
+}
+
+model Team {
+  id        String @id @default(cuid())
+  name      String
+  code      String @unique // code alpha-2 pour le drapeau (ex: FR, BR)
+  groupName String // "A" .. "L"
+
+  homeMatches Match[] @relation("home")
+  awayMatches Match[] @relation("away")
+}
+
+model Match {
+  id        String   @id @default(cuid())
+  number    Int      @unique // numéro officiel du match
+  stage     String // GROUP, R32, R16, QF, SF, THIRD, FINAL
+  groupName String? // lettre du groupe pour la phase de poules
+  kickoff   DateTime // coup d'envoi — verrouille les pronos
+  venue     String?
+
+  homeTeamId String?
+  awayTeamId String?
+  homeTeam   Team?   @relation("home", fields: [homeTeamId], references: [id])
+  awayTeam   Team?   @relation("away", fields: [awayTeamId], references: [id])
+  // libellés pour les matchs à venir dont l'équipe n'est pas encore connue (ex: "Vainqueur Groupe A")
+  homeLabel String?
+  awayLabel String?
+
+  homeScore Int?
+  awayScore Int?
+  finished  Boolean @default(false)
+
+  predictions MatchPrediction[]
+}
+
+model MatchPrediction {
+  id        String @id @default(cuid())
+  userId    String
+  matchId   String
+  homeScore Int
+  awayScore Int
+  points    Int    @default(0)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+}
+
+// Pronostic des qualifiés d'une poule (1er et 2e)
+model GroupPrediction {
+  id         String @id @default(cuid())
+  userId     String
+  groupName  String
+  firstCode  String // code de l'équipe pronostiquée 1re
+  secondCode String // code de l'équipe pronostiquée 2e
+  points     Int    @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupName])
+}
+
+// Pronostics long terme (avant le tournoi) : vainqueur final + finaliste
+model LongPrediction {
+  id           String  @id @default(cuid())
+  userId       String  @unique
+  championCode String // code de l'équipe championne pronostiquée
+  finalistCode String? // finaliste (optionnel)
+  points       Int     @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Réglages globaux (clé/valeur) : double points phase finale, etc.
+model Setting {
+  key   String @id
+  value String
+}

@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0b1220;
+  --surface: #131c2e;
+  --surface-2: #1b263b;
+  --border: #2a3654;
+  --foreground: #eef2ff;
+  --muted: #9aa6c2;
+  --primary: #16a34a; /* vert pelouse */
+  --primary-hover: #15803d;
+  --accent: #facc15; /* jaune (carton / trophée) */
+  --danger: #ef4444;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background:
+    radial-gradient(
+      1200px 600px at 50% -200px,
+      rgba(22, 163, 74, 0.18),
+      transparent
+    ),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-border bg-surface p-4 shadow-lg;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold transition active:scale-95 disabled:opacity-50 bg-primary text-white hover:bg-primary-hover;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold transition active:scale-95 disabled:opacity-50 border border-border bg-surface-2 text-foreground hover:bg-border;
+  }
+  .input {
+    @apply w-full rounded-xl border border-border bg-surface-2 px-4 py-2.5 text-foreground outline-none placeholder:text-muted focus:border-primary;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-muted;
+  }
+}
