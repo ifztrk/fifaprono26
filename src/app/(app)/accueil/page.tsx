@@ -21,21 +21,32 @@ export default async function AccueilPage() {
   const user = (await getCurrentUser())!;
   const now = new Date();
 
-  const [rows, upcoming, totalPreds, upcomingCount, teams] = await Promise.all([
-    getLeaderboard(),
-    prisma.match.findMany({
-      where: { kickoff: { gt: now } },
-      orderBy: { kickoff: "asc" },
-      take: 4,
-      include: { homeTeam: true, awayTeam: true },
-    }),
-    prisma.matchPrediction.count({ where: { userId: user.id } }),
-    prisma.match.count({ where: { kickoff: { gt: now } } }),
-    prisma.team.findMany({ select: { code: true }, orderBy: { name: "asc" } }),
-  ]);
+  // Un match est "jouable" quand ses 2 équipes sont connues et qu'il n'a pas commencé
+  const playable = {
+    kickoff: { gt: now },
+    homeTeamId: { not: null },
+    awayTeamId: { not: null },
+  } as const;
+
+  const [rows, upcoming, playableCount, predictedUpcoming, teams] =
+    await Promise.all([
+      getLeaderboard(),
+      prisma.match.findMany({
+        where: playable,
+        orderBy: { kickoff: "asc" },
+        take: 4,
+        include: { homeTeam: true, awayTeam: true },
+      }),
+      prisma.match.count({ where: playable }),
+      prisma.matchPrediction.count({
+        where: { userId: user.id, match: playable },
+      }),
+      prisma.team.findMany({ select: { code: true }, orderBy: { name: "asc" } }),
+    ]);
 
   const me = rows.find((r) => r.userId === user.id);
   const rank = rows.findIndex((r) => r.userId === user.id) + 1;
+  const remaining = Math.max(0, playableCount - predictedUpcoming);
   const predictedIds = new Set(
     (
       await prisma.matchPrediction.findMany({
@@ -162,13 +173,9 @@ export default async function AccueilPage() {
           </div>
         )}
 
-        {upcomingCount > totalPreds && (
-          <Link
-            href="/matchs"
-            className="btn-gold mt-3 flex w-full"
-          >
-            ✍️ {upcomingCount - totalPreds} match
-            {upcomingCount - totalPreds > 1 ? "s" : ""} à pronostiquer
+        {remaining > 0 && (
+          <Link href="/matchs" className="btn-gold mt-3 flex w-full">
+            ✍️ {remaining} match{remaining > 1 ? "s" : ""} à pronostiquer
           </Link>
         )}
       </section>

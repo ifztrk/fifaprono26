@@ -57,7 +57,11 @@ export default async function MatchsPage() {
   const predMap = new Map(preds.map((p) => [p.matchId, p]));
   const now = new Date();
 
-  if (matches.length === 0) {
+  // On n'affiche un match que lorsque ses 2 équipes sont connues
+  // (les matchs de phase finale apparaissent au fur et à mesure des qualifications).
+  const visibleMatches = matches.filter((m) => m.homeTeam && m.awayTeam);
+
+  if (visibleMatches.length === 0) {
     return (
       <div className="card text-center">
         <p className="text-4xl">⚽</p>
@@ -72,7 +76,7 @@ export default async function MatchsPage() {
 
   // Regroupement par jour
   const days: { key: string; date: Date; matches: typeof matches }[] = [];
-  for (const m of matches) {
+  for (const m of visibleMatches) {
     const k = dayKey(m.kickoff);
     let bucket = days.find((d) => d.key === k);
     if (!bucket) {
