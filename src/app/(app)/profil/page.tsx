@@ -5,6 +5,7 @@ import { countryName } from "@/lib/countries";
 import TeamFlag from "@/components/TeamFlag";
 import { logoutAction } from "../../(auth)/actions";
 import ChangePasswordForm from "./ChangePasswordForm";
+import NotificationsButton from "./NotificationsButton";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +95,8 @@ export default async function ProfilPage() {
           </div>
         )}
       </div>
+
+      <NotificationsButton />
 
       <ChangePasswordForm />
 
