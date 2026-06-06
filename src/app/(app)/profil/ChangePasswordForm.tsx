@@ -36,7 +36,7 @@ export default function ChangePasswordForm() {
           type="password"
           autoComplete="new-password"
           required
-          minLength={6}
+          minLength={8}
           className="input"
         />
       </div>
@@ -50,7 +50,7 @@ export default function ChangePasswordForm() {
           type="password"
           autoComplete="new-password"
           required
-          minLength={6}
+          minLength={8}
           className="input"
         />
       </div>

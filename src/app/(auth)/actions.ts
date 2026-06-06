@@ -26,8 +26,8 @@ export async function registerAction(
   if (!displayName || displayName.length < 2)
     return { error: "Choisis un pseudo (2 caractères minimum)." };
   if (!EMAIL_RE.test(email)) return { error: "Adresse email invalide." };
-  if (password.length < 6)
-    return { error: "Le mot de passe doit faire au moins 6 caractères." };
+  if (password.length < 8)
+    return { error: "Le mot de passe doit faire au moins 8 caractères." };
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return { error: "Un compte existe déjà avec cet email." };

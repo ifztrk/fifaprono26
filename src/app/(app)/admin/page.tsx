@@ -170,6 +170,7 @@ export default async function AdminPage() {
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
+                    inputMode="numeric"
                     name="homeScore"
                     min={0}
                     defaultValue={m.homeScore ?? ""}
@@ -179,6 +180,7 @@ export default async function AdminPage() {
                   <span className="text-muted">-</span>
                   <input
                     type="number"
+                    inputMode="numeric"
                     name="awayScore"
                     min={0}
                     defaultValue={m.awayScore ?? ""}

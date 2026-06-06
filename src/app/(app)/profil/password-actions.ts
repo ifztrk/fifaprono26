@@ -18,8 +18,8 @@ export async function changePasswordAction(
 
   if (!(await verifyPassword(current, user.passwordHash)))
     return { error: "Mot de passe actuel incorrect." };
-  if (next.length < 6)
-    return { error: "Le nouveau mot de passe doit faire au moins 6 caractères." };
+  if (next.length < 8)
+    return { error: "Le nouveau mot de passe doit faire au moins 8 caractères." };
   if (next !== confirm) return { error: "Les deux mots de passe ne correspondent pas." };
 
   await prisma.user.update({

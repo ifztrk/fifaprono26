@@ -117,6 +117,7 @@ export default async function MatchsPage() {
                   homeCell = (
                     <input
                       type="number"
+                      inputMode="numeric"
                       name={`home_${m.id}`}
                       min={0}
                       max={99}
@@ -128,6 +129,7 @@ export default async function MatchsPage() {
                   awayCell = (
                     <input
                       type="number"
+                      inputMode="numeric"
                       name={`away_${m.id}`}
                       min={0}
                       max={99}
