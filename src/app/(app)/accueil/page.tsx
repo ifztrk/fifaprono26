@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/leaderboard";
 import { teamColor } from "@/lib/teamColors";
 import { formatDay, formatTime } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone";
 import FlagMarquee from "../FlagMarquee";
 import TeamFlag from "@/components/TeamFlag";
 import ExactCelebration from "./ExactCelebration";
@@ -28,8 +29,9 @@ export default async function AccueilPage() {
     awayTeamId: { not: null },
   } as const;
 
-  const [rows, upcoming, playableCount, predictedUpcoming, teams] =
+  const [tz, rows, upcoming, playableCount, predictedUpcoming, teams] =
     await Promise.all([
+      getTimeZone(),
       getLeaderboard(),
       prisma.match.findMany({
         where: playable,
@@ -154,8 +156,8 @@ export default async function AccueilPage() {
                   </div>
                   <div className="mt-2 flex items-center justify-between text-xs text-muted">
                     <span>
-                      {formatDay(m.kickoff).split(" ").slice(0, 3).join(" ")} ·{" "}
-                      {formatTime(m.kickoff)}
+                      {formatDay(m.kickoff, tz).split(" ").slice(0, 3).join(" ")}{" "}
+                      · {formatTime(m.kickoff, tz)}
                     </span>
                     <span
                       className={`rounded-full px-2 py-0.5 font-semibold ${

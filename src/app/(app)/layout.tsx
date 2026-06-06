@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import ThemeToggle from "@/components/ThemeToggle";
 import TeamFlag from "@/components/TeamFlag";
 import Nav, { DesktopNav } from "./Nav";
+import TimeZoneSync from "./TimeZoneSync";
 
 export default async function AppLayout({
   children,
@@ -16,6 +17,7 @@ export default async function AppLayout({
 
   return (
     <div className="mx-auto min-h-dvh max-w-3xl px-4 pb-28 pt-3 sm:pb-10">
+      <TimeZoneSync />
       <header className="sticky top-0 z-30 -mx-4 mb-5 border-b border-border/60 bg-background/80 px-4 py-3 backdrop-blur-md">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
           <Link href="/accueil" className="flex items-center gap-1.5">

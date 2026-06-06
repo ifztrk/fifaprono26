@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getAllSettings } from "@/lib/settings";
 import { flagEmoji } from "@/lib/countries";
 import { formatDay, formatTime, stageLabel } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone";
 import {
   recomputeAction,
   saveSettingsAction,
@@ -19,7 +20,8 @@ export default async function AdminPage() {
   if (!user) redirect("/login");
   if (!user.isAdmin) redirect("/matchs");
 
-  const [matches, teams, settings, users, helpRequests] = await Promise.all([
+  const [tz, matches, teams, settings, users, helpRequests] = await Promise.all([
+    getTimeZone(),
     prisma.match.findMany({
       orderBy: { kickoff: "asc" },
       include: { homeTeam: true, awayTeam: true },
@@ -59,7 +61,7 @@ export default async function AdminPage() {
                     <div className="min-w-0">
                       <p className="truncate font-semibold">{h.email}</p>
                       <p className="text-xs text-muted">
-                        {formatDay(h.createdAt)} · {formatTime(h.createdAt)}
+                        {formatDay(h.createdAt, tz)} · {formatTime(h.createdAt, tz)}
                       </p>
                       {h.message && (
                         <p className="mt-1 text-sm">“{h.message}”</p>
@@ -172,7 +174,7 @@ export default async function AdminPage() {
                     {m.groupName ? ` · Gr. ${m.groupName}` : ""}
                   </span>
                   <span>
-                    {formatDay(m.kickoff)} {formatTime(m.kickoff)}
+                    {formatDay(m.kickoff, tz)} {formatTime(m.kickoff, tz)}
                   </span>
                 </div>
 

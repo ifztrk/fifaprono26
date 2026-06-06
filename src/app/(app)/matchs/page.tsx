@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { teamColor } from "@/lib/teamColors";
 import { dayKey, formatDay, formatTime, stageLabel } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone";
 import { savePredictionsAction } from "./actions";
 import SaveBar from "./SaveBar";
 import TeamFlag from "@/components/TeamFlag";
@@ -46,7 +47,8 @@ function TeamLine({
 export default async function MatchsPage() {
   const user = (await getCurrentUser())!;
 
-  const [matches, preds] = await Promise.all([
+  const [tz, matches, preds] = await Promise.all([
+    getTimeZone(),
     prisma.match.findMany({
       orderBy: { kickoff: "asc" },
       include: { homeTeam: true, awayTeam: true },
@@ -77,7 +79,7 @@ export default async function MatchsPage() {
   // Regroupement par jour
   const days: { key: string; date: Date; matches: typeof matches }[] = [];
   for (const m of visibleMatches) {
-    const k = dayKey(m.kickoff);
+    const k = dayKey(m.kickoff, tz);
     let bucket = days.find((d) => d.key === k);
     if (!bucket) {
       bucket = { key: k, date: m.kickoff, matches: [] };
@@ -94,6 +96,7 @@ export default async function MatchsPage() {
           <span className="chip">🎯 Exact = 3 pts</span>
           <span className="chip">✅ Bon résultat = 1 pt</span>
           <span className="chip">🔒 Verrou au coup d&apos;envoi</span>
+          <span className="chip">🕒 Heures dans ton fuseau</span>
         </div>
       </div>
 
@@ -101,7 +104,7 @@ export default async function MatchsPage() {
         {days.map((day) => (
           <section key={day.key}>
             <h2 className="mb-2 text-sm font-bold capitalize text-muted">
-              {formatDay(day.date)}
+              {formatDay(day.date, tz)}
             </h2>
             <div className="space-y-2.5">
               {day.matches.map((m) => {
@@ -184,7 +187,7 @@ export default async function MatchsPage() {
                       </span>
                       <span className="shrink-0">
                         {locked ? "🔒 " : "🕒 "}
-                        {formatTime(m.kickoff)}
+                        {formatTime(m.kickoff, tz)}
                       </span>
                     </div>
 
