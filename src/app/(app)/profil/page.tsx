@@ -4,6 +4,7 @@ import { getLeaderboard } from "@/lib/leaderboard";
 import { countryName } from "@/lib/countries";
 import TeamFlag from "@/components/TeamFlag";
 import { logoutAction } from "../../(auth)/actions";
+import ChangePasswordForm from "./ChangePasswordForm";
 
 export const dynamic = "force-dynamic";
 
@@ -93,6 +94,8 @@ export default async function ProfilPage() {
           </div>
         )}
       </div>
+
+      <ChangePasswordForm />
 
       <form action={logoutAction}>
         <button type="submit" className="btn-ghost w-full text-danger">

@@ -9,6 +9,7 @@ import {
   saveSettingsAction,
   updateMatchAction,
 } from "./actions";
+import ResetPasswordButton from "./ResetPasswordButton";
 
 export const dynamic = "force-dynamic";
 
@@ -17,13 +18,14 @@ export default async function AdminPage() {
   if (!user) redirect("/login");
   if (!user.isAdmin) redirect("/matchs");
 
-  const [matches, teams, settings] = await Promise.all([
+  const [matches, teams, settings, users] = await Promise.all([
     prisma.match.findMany({
       orderBy: { kickoff: "asc" },
       include: { homeTeam: true, awayTeam: true },
     }),
     prisma.team.findMany({ orderBy: [{ groupName: "asc" }, { name: "asc" }] }),
     getAllSettings(),
+    prisma.user.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
 
   const doublePoints = settings.doublePointsKnockout === "1";
@@ -64,6 +66,37 @@ export default async function AdminPage() {
           🔄 Recalculer les points
         </button>
       </form>
+
+      {/* Utilisateurs */}
+      <div>
+        <h2 className="mb-2 font-bold">Utilisateurs ({users.length})</h2>
+        <p className="mb-2 text-sm text-muted">
+          Réinitialise le mot de passe d&apos;un joueur : un mot de passe
+          temporaire s&apos;affiche, transmets-le-lui (il pourra le changer dans
+          son profil).
+        </p>
+        <div className="space-y-2">
+          {users.map((u) => (
+            <div
+              key={u.id}
+              className="card flex items-center justify-between gap-3 !p-3"
+            >
+              <div className="min-w-0">
+                <p className="flex items-center gap-1.5 truncate font-semibold">
+                  {u.displayName}
+                  {u.isAdmin && (
+                    <span className="rounded-full bg-gold/20 px-1.5 py-0.5 text-[10px] font-bold text-gold">
+                      ADMIN
+                    </span>
+                  )}
+                </p>
+                <p className="truncate text-xs text-muted">{u.email}</p>
+              </div>
+              <ResetPasswordButton userId={u.id} displayName={u.displayName} />
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Matchs */}
       <div>
