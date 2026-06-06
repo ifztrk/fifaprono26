@@ -3,19 +3,26 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const LINKS = [
+type Item = { href: string; label: string; icon: string };
+
+// Barre du bas (mobile) : 5 onglets essentiels (Finale accessible via l'accueil)
+const MOBILE: Item[] = [
+  { href: "/accueil", label: "Accueil", icon: "🏠" },
+  { href: "/matchs", label: "Matchs", icon: "⚽" },
+  { href: "/poules", label: "Groupes", icon: "📊" },
+  { href: "/classement", label: "Classement", icon: "🥇" },
+  { href: "/chambrage", label: "Chambrage", icon: "💬" },
+];
+
+// Barre du haut (desktop) : tout
+const DESKTOP: Item[] = [
   { href: "/accueil", label: "Accueil", icon: "🏠" },
   { href: "/matchs", label: "Matchs", icon: "⚽" },
   { href: "/poules", label: "Groupes", icon: "📊" },
   { href: "/finale", label: "Finale", icon: "🏆" },
   { href: "/classement", label: "Classement", icon: "🥇" },
+  { href: "/chambrage", label: "Chambrage", icon: "💬" },
 ];
-
-function useLinks(isAdmin: boolean) {
-  return isAdmin
-    ? [...LINKS, { href: "/admin", label: "Admin", icon: "🛠️" }]
-    : LINKS;
-}
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
@@ -23,7 +30,9 @@ function isActive(pathname: string, href: string) {
 
 export default function Nav({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
-  const links = useLinks(isAdmin);
+  const links = isAdmin
+    ? [...MOBILE, { href: "/admin", label: "Admin", icon: "🛠️" }]
+    : MOBILE;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sm:hidden">
@@ -59,7 +68,9 @@ export default function Nav({ isAdmin }: { isAdmin: boolean }) {
 
 export function DesktopNav({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
-  const links = useLinks(isAdmin);
+  const links = isAdmin
+    ? [...DESKTOP, { href: "/admin", label: "Admin", icon: "🛠️" }]
+    : DESKTOP;
 
   return (
     <nav className="hidden items-center gap-1 sm:flex">

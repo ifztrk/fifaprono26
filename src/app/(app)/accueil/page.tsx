@@ -29,26 +29,45 @@ export default async function AccueilPage() {
     awayTeamId: { not: null },
   } as const;
 
-  const [tz, rows, upcoming, playableCount, predictedUpcoming, teams] =
-    await Promise.all([
-      getTimeZone(),
-      getLeaderboard(),
-      prisma.match.findMany({
-        where: playable,
-        orderBy: { kickoff: "asc" },
-        take: 4,
-        include: { homeTeam: true, awayTeam: true },
-      }),
-      prisma.match.count({ where: playable }),
-      prisma.matchPrediction.count({
-        where: { userId: user.id, match: playable },
-      }),
-      prisma.team.findMany({ select: { code: true }, orderBy: { name: "asc" } }),
-    ]);
+  // Matchs imminents (prochaines 24h) pour le rappel
+  const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const soon = {
+    kickoff: { gt: now, lte: in24h },
+    homeTeamId: { not: null },
+    awayTeamId: { not: null },
+  } as const;
+
+  const [
+    tz,
+    rows,
+    upcoming,
+    playableCount,
+    predictedUpcoming,
+    teams,
+    soonTotal,
+    soonPredicted,
+  ] = await Promise.all([
+    getTimeZone(),
+    getLeaderboard(),
+    prisma.match.findMany({
+      where: playable,
+      orderBy: { kickoff: "asc" },
+      take: 4,
+      include: { homeTeam: true, awayTeam: true },
+    }),
+    prisma.match.count({ where: playable }),
+    prisma.matchPrediction.count({
+      where: { userId: user.id, match: playable },
+    }),
+    prisma.team.findMany({ select: { code: true }, orderBy: { name: "asc" } }),
+    prisma.match.count({ where: soon }),
+    prisma.matchPrediction.count({ where: { userId: user.id, match: soon } }),
+  ]);
 
   const me = rows.find((r) => r.userId === user.id);
   const rank = rows.findIndex((r) => r.userId === user.id) + 1;
   const remaining = Math.max(0, playableCount - predictedUpcoming);
+  const soonRemaining = Math.max(0, soonTotal - soonPredicted);
   const predictedIds = new Set(
     (
       await prisma.matchPrediction.findMany({
@@ -61,6 +80,22 @@ export default async function AccueilPage() {
   return (
     <div className="space-y-6">
       <ExactCelebration count={me?.exactCount ?? 0} />
+
+      {/* Rappel : matchs imminents non pronostiqués */}
+      {soonRemaining > 0 && (
+        <Link
+          href="/matchs"
+          className="flex items-center gap-3 rounded-2xl border border-gold/50 bg-gold/15 px-4 py-3 font-semibold text-gold"
+        >
+          <span className="text-2xl">⏰</span>
+          <span className="text-sm">
+            {soonRemaining} match{soonRemaining > 1 ? "s" : ""} dans les
+            prochaines 24h que tu n&apos;as pas encore pronostiqué
+            {soonRemaining > 1 ? "s" : ""} !
+          </span>
+        </Link>
+      )}
+
       {/* Héro : salutation + rang/points */}
       <section className="card relative overflow-hidden">
         <div
