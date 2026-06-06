@@ -17,5 +17,5 @@ export async function saveFavoriteAction(formData: FormData): Promise<void> {
     data: { favoriteCode: valid ? code : null, onboarded: true },
   });
 
-  redirect("/matchs");
+  redirect("/accueil");
 }

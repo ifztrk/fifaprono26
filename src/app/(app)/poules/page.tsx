@@ -37,14 +37,14 @@ export default async function PoulesPage() {
   return (
     <form action={saveGroupPredictionsAction}>
       <div className="mb-4">
-        <h1 className="text-2xl font-black">Poules & qualifiés 📊</h1>
-        <p className="text-sm text-muted">
-          Pronostique les 2 équipes qualifiées de chaque groupe (2 pts par bonne
-          équipe).{" "}
-          {locked
-            ? "🔒 Pronostics verrouillés (le tournoi a commencé)."
-            : "Modifiable jusqu'au coup d'envoi du tournoi."}
-        </p>
+        <h1 className="display text-2xl font-extrabold">Poules & qualifiés 📊</h1>
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          <span className="chip">🥇🥈 2 qualifiés / groupe</span>
+          <span className="chip">+2 pts par bonne équipe</span>
+          <span className="chip">
+            {locked ? "🔒 Verrouillé" : "✏️ Modifiable avant le tournoi"}
+          </span>
+        </div>
       </div>
 
       <div className="space-y-4">

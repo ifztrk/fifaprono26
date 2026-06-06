@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b1220;
-  --surface: #131c2e;
-  --surface-2: #1b263b;
-  --border: #2a3654;
-  --foreground: #eef2ff;
-  --muted: #9aa6c2;
-  --primary: #16a34a; /* vert pelouse */
-  --primary-hover: #15803d;
-  --accent: #facc15; /* jaune (carton / trophée) */
-  --danger: #ef4444;
+  --background: #070c18;
+  --surface: #101a2e;
+  --surface-2: #182542;
+  --border: #25355a;
+  --foreground: #eaf0ff;
+  --muted: #8e9cbe;
+  --primary: #1fa463; /* vert pelouse */
+  --primary-hover: #178a52;
+  --gold: #f7c948; /* or trophée */
+  --gold-soft: #fbe08a;
+  --danger: #f05252;
 }
 
 @theme inline {
@@ -22,38 +23,81 @@
   --color-muted: var(--muted);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
-  --color-accent: var(--accent);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
   --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
 }
 
 body {
   background:
     radial-gradient(
-      1200px 600px at 50% -200px,
-      rgba(22, 163, 74, 0.18),
-      transparent
+      900px 500px at 85% -150px,
+      rgba(247, 201, 72, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      1100px 600px at 15% -200px,
+      rgba(31, 164, 99, 0.22),
+      transparent 60%
     ),
     var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 @layer components {
+  .display {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    letter-spacing: -0.02em;
+  }
+  .gradient-text {
+    background: linear-gradient(100deg, var(--color-primary), var(--color-gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
   .card {
-    @apply rounded-2xl border border-border bg-surface p-4 shadow-lg;
+    @apply rounded-2xl border border-border bg-surface/80 p-4 shadow-lg backdrop-blur-sm;
+  }
+  .card-2 {
+    @apply rounded-2xl border border-border bg-surface-2/70 p-4;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold transition active:scale-95 disabled:opacity-50 bg-primary text-white hover:bg-primary-hover;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white transition active:scale-95 disabled:opacity-50;
+    background: linear-gradient(180deg, var(--color-primary), var(--color-primary-hover));
+    box-shadow: 0 6px 20px -8px rgba(31, 164, 99, 0.7);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.08);
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold transition active:scale-95 disabled:opacity-50;
+    color: #2a1e00;
+    background: linear-gradient(180deg, var(--color-gold-soft), var(--color-gold));
+    box-shadow: 0 6px 20px -8px rgba(247, 201, 72, 0.7);
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold transition active:scale-95 disabled:opacity-50 border border-border bg-surface-2 text-foreground hover:bg-border;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-2/70 px-4 py-3 font-semibold text-foreground transition hover:bg-surface-2 active:scale-95 disabled:opacity-50;
   }
   .input {
-    @apply w-full rounded-xl border border-border bg-surface-2 px-4 py-2.5 text-foreground outline-none placeholder:text-muted focus:border-primary;
+    @apply w-full rounded-xl border border-border bg-surface-2/70 px-4 py-2.5 text-foreground outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/30;
   }
   .label {
     @apply mb-1.5 block text-sm font-medium text-muted;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2/70 px-3 py-1 text-xs font-medium text-muted;
+  }
+  .score-input {
+    @apply w-12 rounded-xl border border-border bg-surface-2 px-0 py-2 text-center text-lg font-black text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/30;
+    appearance: textfield;
+  }
+  .score-input::-webkit-outer-spin-button,
+  .score-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }

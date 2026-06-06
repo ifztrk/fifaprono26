@@ -13,9 +13,9 @@ export default async function ClassementPage() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-2xl font-black">Classement 🥇</h1>
+        <h1 className="display text-2xl font-extrabold">Classement 🥇</h1>
         <p className="text-sm text-muted">
-          Le grand duel entre amis. {rows.length} joueur
+          Le grand duel entre amis · {rows.length} joueur
           {rows.length > 1 ? "s" : ""} en lice.
         </p>
       </div>
@@ -28,7 +28,7 @@ export default async function ClassementPage() {
               key={r.userId}
               className={`card flex items-center gap-3 !p-3 ${
                 me ? "ring-2 ring-primary" : ""
-              }`}
+              } ${i === 0 ? "border-gold/50" : ""}`}
             >
               <div className="w-8 shrink-0 text-center text-lg font-black">
                 {MEDALS[i] ?? <span className="text-muted">{i + 1}</span>}

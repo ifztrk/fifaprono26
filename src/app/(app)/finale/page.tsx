@@ -31,13 +31,14 @@ export default async function FinalePage() {
   return (
     <form action={saveLongPredictionAction}>
       <div className="mb-4">
-        <h1 className="text-2xl font-black">Vainqueur final 🏆</h1>
-        <p className="text-sm text-muted">
-          Qui soulève la Coupe ? Vainqueur = 10 pts · Finaliste = 5 pts.{" "}
-          {locked
-            ? "🔒 Verrouillé (le tournoi a commencé)."
-            : "Modifiable jusqu'au coup d'envoi du tournoi."}
-        </p>
+        <h1 className="display text-2xl font-extrabold">Vainqueur final 🏆</h1>
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          <span className="chip">🏆 Champion = 10 pts</span>
+          <span className="chip">🥈 Finaliste = 5 pts</span>
+          <span className="chip">
+            {locked ? "🔒 Verrouillé" : "✏️ Modifiable avant le tournoi"}
+          </span>
+        </div>
       </div>
 
       <div className="card space-y-4">

@@ -57,7 +57,7 @@ export async function loginAction(
     return { error: "Email ou mot de passe incorrect." };
 
   await createSession(user.id);
-  redirect(user.onboarded ? "/matchs" : "/onboarding");
+  redirect(user.onboarded ? "/accueil" : "/onboarding");
 }
 
 export async function logoutAction(): Promise<void> {

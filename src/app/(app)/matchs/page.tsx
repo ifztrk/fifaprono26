@@ -82,11 +82,12 @@ export default async function MatchsPage() {
   return (
     <form action={savePredictionsAction}>
       <div className="mb-4">
-        <h1 className="text-2xl font-black">Les matchs ⚽</h1>
-        <p className="text-sm text-muted">
-          3 pts pour le score exact · 1 pt pour le bon résultat. Les pronos se
-          verrouillent au coup d&apos;envoi.
-        </p>
+        <h1 className="display text-2xl font-extrabold">Les matchs ⚽</h1>
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          <span className="chip">🎯 Exact = 3 pts</span>
+          <span className="chip">✅ Bon résultat = 1 pt</span>
+          <span className="chip">🔒 Verrou au coup d&apos;envoi</span>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -145,7 +146,7 @@ export default async function MatchsPage() {
                               min={0}
                               max={99}
                               defaultValue={pred?.homeScore ?? ""}
-                              className="input w-12 px-0 text-center text-lg font-bold"
+                              className="score-input"
                               aria-label="Score domicile"
                             />
                             <span className="text-muted">-</span>
@@ -155,7 +156,7 @@ export default async function MatchsPage() {
                               min={0}
                               max={99}
                               defaultValue={pred?.awayScore ?? ""}
-                              className="input w-12 px-0 text-center text-lg font-bold"
+                              className="score-input"
                               aria-label="Score extérieur"
                             />
                           </>
