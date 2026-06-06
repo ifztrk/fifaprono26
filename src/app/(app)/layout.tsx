@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { logoutAction } from "../(auth)/actions";
 import { flagEmoji } from "@/lib/countries";
+import ThemeToggle from "@/components/ThemeToggle";
 import Nav, { DesktopNav } from "./Nav";
 
 export default async function AppLayout({
@@ -29,6 +30,7 @@ export default async function AppLayout({
           <DesktopNav isAdmin={user.isAdmin} />
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/profil"
               className="flex items-center gap-1.5 rounded-full border border-border bg-surface-2/70 py-1 pl-1 pr-3 text-sm transition hover:border-primary/50"

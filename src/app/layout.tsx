@@ -34,7 +34,16 @@ export default function RootLayout({
     <html
       lang="fr"
       className={`${geistSans.variable} ${outfit.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Applique le thème mémorisé avant le rendu (évite le flash) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(localStorage.getItem('theme')==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-full">{children}</body>
     </html>
   );

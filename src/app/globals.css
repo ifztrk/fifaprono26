@@ -1,15 +1,31 @@
 @import "tailwindcss";
 
+/* Thème clair (par défaut) */
 :root {
+  --background: #f6f8fc;
+  --surface: #ffffff;
+  --surface-2: #eef2f9;
+  --border: #dde4ef;
+  --foreground: #101726;
+  --muted: #5f6c85;
+  --primary: #15994f; /* vert pelouse */
+  --primary-hover: #0f7e40;
+  --gold: #c2890b; /* or trophée (lisible sur blanc) */
+  --gold-soft: #f3d27a;
+  --danger: #dc2626;
+}
+
+/* Mode nuit */
+.dark {
   --background: #070c18;
   --surface: #101a2e;
   --surface-2: #182542;
   --border: #25355a;
   --foreground: #eaf0ff;
   --muted: #8e9cbe;
-  --primary: #1fa463; /* vert pelouse */
+  --primary: #1fa463;
   --primary-hover: #178a52;
-  --gold: #f7c948; /* or trophée */
+  --gold: #f7c948;
   --gold-soft: #fbe08a;
   --danger: #f05252;
 }
@@ -34,6 +50,24 @@ body {
   background:
     radial-gradient(
       900px 500px at 85% -150px,
+      rgba(247, 201, 72, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      1100px 600px at 15% -200px,
+      rgba(31, 164, 99, 0.12),
+      transparent 60%
+    ),
+    var(--background);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.dark body {
+  background:
+    radial-gradient(
+      900px 500px at 85% -150px,
       rgba(247, 201, 72, 0.1),
       transparent 60%
     ),
@@ -44,8 +78,6 @@ body {
     ),
     var(--background);
   background-attachment: fixed;
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 @layer components {

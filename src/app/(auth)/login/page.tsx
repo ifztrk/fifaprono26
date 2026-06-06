@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 import { loginAction, type AuthState } from "../actions";
 
 export default function LoginPage() {
@@ -11,7 +12,10 @@ export default function LoginPage() {
   );
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-5 py-10">
+    <main className="relative mx-auto flex min-h-dvh max-w-md flex-col justify-center px-5 py-10">
+      <div className="absolute right-5 top-5">
+        <ThemeToggle />
+      </div>
       <div className="mb-8 text-center">
         <div className="mb-2 text-5xl">🏆</div>
         <h1 className="display text-4xl font-black tracking-tight">
