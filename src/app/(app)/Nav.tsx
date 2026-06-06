@@ -26,7 +26,7 @@ export default function Nav({ isAdmin }: { isAdmin: boolean }) {
   const links = useLinks(isAdmin);
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/90 backdrop-blur-md sm:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md sm:hidden">
       <ul className="mx-auto flex max-w-3xl">
         {links.map((l) => {
           const active = isActive(pathname, l.href);
@@ -34,16 +34,20 @@ export default function Nav({ isAdmin }: { isAdmin: boolean }) {
             <li key={l.href} className="flex-1">
               <Link
                 href={l.href}
-                className={`flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold transition ${
+                className={`flex flex-col items-center gap-1 py-2 transition ${
                   active ? "text-primary" : "text-muted"
                 }`}
               >
                 <span
-                  className={`text-lg transition ${active ? "scale-110" : ""}`}
+                  className={`grid size-9 place-items-center rounded-xl text-lg transition ${
+                    active ? "scale-105 bg-primary/15" : ""
+                  }`}
                 >
                   {l.icon}
                 </span>
-                {l.label}
+                <span className="w-full truncate text-center text-[10px] font-semibold leading-none">
+                  {l.label}
+                </span>
               </Link>
             </li>
           );

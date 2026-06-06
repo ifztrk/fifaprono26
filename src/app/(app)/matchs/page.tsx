@@ -10,33 +10,35 @@ export const dynamic = "force-dynamic";
 
 type TeamMini = { name: string; code: string } | null;
 
-function Side({
+// Une ligne d'équipe : drapeau + nom (tronqué) + cellule de score à droite.
+function TeamLine({
   team,
   label,
-  align,
+  scoreCell,
+  dim = false,
 }: {
   team: TeamMini;
   label: string | null;
-  align: "left" | "right";
+  scoreCell: React.ReactNode;
+  dim?: boolean;
 }) {
-  const content = team ? (
-    <>
-      <TeamFlag code={team.code} size={36} />
-      <span className="font-semibold">{team.name}</span>
-    </>
-  ) : (
-    <>
-      <span className="text-2xl">❔</span>
-      <span className="text-muted">{label ?? "À déterminer"}</span>
-    </>
-  );
   return (
-    <div
-      className={`flex flex-1 items-center gap-2 ${
-        align === "right" ? "flex-row-reverse text-right" : ""
-      }`}
-    >
-      {content}
+    <div className="flex items-center gap-2.5">
+      {team ? (
+        <TeamFlag code={team.code} size={28} />
+      ) : (
+        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-2 text-muted">
+          ?
+        </span>
+      )}
+      <span
+        className={`min-w-0 flex-1 truncate font-semibold ${
+          team ? (dim ? "text-muted" : "") : "text-muted"
+        }`}
+      >
+        {team?.name ?? label ?? "À déterminer"}
+      </span>
+      {scoreCell}
     </div>
   );
 }
@@ -94,100 +96,115 @@ export default async function MatchsPage() {
       <div className="space-y-6">
         {days.map((day) => (
           <section key={day.key}>
-            <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted">
+            <h2 className="mb-2 text-sm font-bold capitalize text-muted">
               {formatDay(day.date)}
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {day.matches.map((m) => {
                 const locked = m.kickoff <= now;
                 const finished =
                   m.finished && m.homeScore !== null && m.awayScore !== null;
                 const pred = predMap.get(m.id);
+                const homeWin =
+                  finished && (m.homeScore ?? 0) > (m.awayScore ?? 0);
+                const awayWin =
+                  finished && (m.awayScore ?? 0) > (m.homeScore ?? 0);
+
+                // Cellules de score selon l'état
+                let homeCell: React.ReactNode;
+                let awayCell: React.ReactNode;
+                if (!locked) {
+                  homeCell = (
+                    <input
+                      type="number"
+                      name={`home_${m.id}`}
+                      min={0}
+                      max={99}
+                      defaultValue={pred?.homeScore ?? ""}
+                      className="score-input"
+                      aria-label={`Score ${m.homeTeam?.name ?? "domicile"}`}
+                    />
+                  );
+                  awayCell = (
+                    <input
+                      type="number"
+                      name={`away_${m.id}`}
+                      min={0}
+                      max={99}
+                      defaultValue={pred?.awayScore ?? ""}
+                      className="score-input"
+                      aria-label={`Score ${m.awayTeam?.name ?? "extérieur"}`}
+                    />
+                  );
+                } else if (finished) {
+                  homeCell = (
+                    <span
+                      className={`w-9 text-center text-2xl font-black ${
+                        homeWin ? "" : "text-muted"
+                      }`}
+                    >
+                      {m.homeScore}
+                    </span>
+                  );
+                  awayCell = (
+                    <span
+                      className={`w-9 text-center text-2xl font-black ${
+                        awayWin ? "" : "text-muted"
+                      }`}
+                    >
+                      {m.awayScore}
+                    </span>
+                  );
+                } else {
+                  homeCell = <span className="w-9 text-center text-muted">–</span>;
+                  awayCell = <span className="w-9 text-center text-muted">–</span>;
+                }
 
                 return (
-                  <div
-                    key={m.id}
-                    className="card relative overflow-hidden !p-3"
-                  >
+                  <div key={m.id} className="card relative overflow-hidden !p-3">
                     <div
-                      className="pointer-events-none absolute inset-x-0 top-0 h-1.5"
+                      className="pointer-events-none absolute inset-y-0 left-0 w-1"
                       style={{
-                        background: `linear-gradient(90deg, ${teamColor(
+                        background: `linear-gradient(180deg, ${teamColor(
                           m.homeTeam?.code,
                         )}, ${teamColor(m.awayTeam?.code)})`,
                       }}
                     />
+
                     <div className="mb-2 flex items-center justify-between text-xs text-muted">
-                      <span>
+                      <span className="truncate">
                         {stageLabel(m.stage)}
                         {m.groupName ? ` · Groupe ${m.groupName}` : ""}
                       </span>
-                      <span>
-                        {locked ? "🔒 " : ""}
+                      <span className="shrink-0">
+                        {locked ? "🔒 " : "🕒 "}
                         {formatTime(m.kickoff)}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <Side
+                    <div className="space-y-1.5">
+                      <TeamLine
                         team={m.homeTeam}
                         label={m.homeLabel}
-                        align="left"
+                        scoreCell={homeCell}
+                        dim={awayWin}
                       />
-
-                      <div className="flex shrink-0 items-center gap-1">
-                        {locked ? (
-                          <div className="text-center">
-                            {finished ? (
-                              <div className="rounded-lg bg-surface-2 px-3 py-1 text-lg font-black">
-                                {m.homeScore}
-                                <span className="mx-1 text-muted">-</span>
-                                {m.awayScore}
-                              </div>
-                            ) : (
-                              <div className="rounded-lg bg-surface-2 px-3 py-1 text-sm text-muted">
-                                à venir
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <>
-                            <input
-                              type="number"
-                              name={`home_${m.id}`}
-                              min={0}
-                              max={99}
-                              defaultValue={pred?.homeScore ?? ""}
-                              className="score-input"
-                              aria-label="Score domicile"
-                            />
-                            <span className="text-muted">-</span>
-                            <input
-                              type="number"
-                              name={`away_${m.id}`}
-                              min={0}
-                              max={99}
-                              defaultValue={pred?.awayScore ?? ""}
-                              className="score-input"
-                              aria-label="Score extérieur"
-                            />
-                          </>
-                        )}
-                      </div>
-
-                      <Side
+                      <TeamLine
                         team={m.awayTeam}
                         label={m.awayLabel}
-                        align="right"
+                        scoreCell={awayCell}
+                        dim={homeWin}
                       />
                     </div>
 
-                    {/* Rappel du prono + points une fois verrouillé */}
                     {locked && (
-                      <div className="mt-2 flex items-center justify-center gap-2 text-xs">
+                      <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs">
                         {pred ? (
                           <span className="text-muted">
-                            Ton prono : {pred.homeScore}-{pred.awayScore}
+                            Ton prono :{" "}
+                            <span className="font-semibold text-foreground">
+                              {pred.homeScore}-{pred.awayScore}
+                            </span>
                           </span>
                         ) : (
                           <span className="text-muted">Pas de prono 😴</span>
@@ -202,7 +219,8 @@ export default async function MatchsPage() {
                                   : "bg-danger/20 text-danger"
                             }`}
                           >
-                            +{pred.points} pt{pred.points > 1 ? "s" : ""}
+                            {pred.points >= 3 ? "🎯 " : ""}+{pred.points} pt
+                            {pred.points > 1 ? "s" : ""}
                           </span>
                         )}
                       </div>

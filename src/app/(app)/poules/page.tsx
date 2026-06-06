@@ -75,12 +75,12 @@ export default async function PoulesPage() {
               <h2 className="display mb-2 text-lg font-bold">Groupe {g}</h2>
 
               {/* Classement */}
-              <table className="mb-3 w-full text-sm">
+              <table className="mb-3 w-full table-fixed text-sm">
                 <thead>
                   <tr className="text-left text-xs text-muted">
                     <th className="font-medium">Équipe</th>
-                    <th className="w-8 text-center font-medium">J</th>
-                    <th className="w-8 text-center font-medium">Diff</th>
+                    <th className="w-7 text-center font-medium">J</th>
+                    <th className="w-9 text-center font-medium">Diff</th>
                     <th className="w-8 text-center font-medium">Pts</th>
                   </tr>
                 </thead>
@@ -95,13 +95,13 @@ export default async function PoulesPage() {
                         }`}
                       >
                         <td className="py-1.5">
-                          <span className="mr-1.5 text-muted">{i + 1}</span>
-                          <TeamFlag
-                            code={r.code}
-                            size={20}
-                            className="mr-1.5 align-middle"
-                          />
-                          {r.name}
+                          <div className="flex min-w-0 items-center gap-1.5">
+                            <span className="w-4 shrink-0 text-center text-muted">
+                              {i + 1}
+                            </span>
+                            <TeamFlag code={r.code} size={20} />
+                            <span className="truncate">{r.name}</span>
+                          </div>
                         </td>
                         <td className="text-center">{r.played}</td>
                         <td className="text-center">

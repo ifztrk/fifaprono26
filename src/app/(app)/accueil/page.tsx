@@ -120,45 +120,42 @@ export default async function AccueilPage() {
                 <Link
                   key={m.id}
                   href="/matchs"
-                  className="card relative flex items-center gap-3 overflow-hidden !py-3 transition hover:border-primary/50"
+                  className="card relative block overflow-hidden !p-3 transition hover:border-primary/50"
                 >
                   <div
-                    className="pointer-events-none absolute inset-x-0 top-0 h-1.5"
+                    className="pointer-events-none absolute inset-y-0 left-0 w-1"
                     style={{
-                      background: `linear-gradient(90deg, ${teamColor(
+                      background: `linear-gradient(180deg, ${teamColor(
                         m.homeTeam?.code,
                       )}, ${teamColor(m.awayTeam?.code)})`,
                     }}
                   />
-                  <div className="flex flex-1 items-center justify-center gap-2 text-sm font-semibold">
-                    <TeamFlag code={m.homeTeam?.code} size={30} />
-                    <span className="hidden sm:inline">
-                      {m.homeTeam?.name ?? "?"}
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <span className="flex min-w-0 flex-1 items-center justify-end gap-1.5 text-right">
+                      <span className="truncate">{m.homeTeam?.name ?? "?"}</span>
+                      <TeamFlag code={m.homeTeam?.code} size={24} />
                     </span>
-                    <span className="text-muted">vs</span>
-                    <span className="hidden sm:inline">
-                      {m.awayTeam?.name ?? "?"}
+                    <span className="shrink-0 text-xs text-muted">vs</span>
+                    <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                      <TeamFlag code={m.awayTeam?.code} size={24} />
+                      <span className="truncate">{m.awayTeam?.name ?? "?"}</span>
                     </span>
-                    <TeamFlag code={m.awayTeam?.code} size={30} />
                   </div>
-                  <div className="shrink-0 text-right">
-                    <p className="text-xs text-muted">
-                      {formatDay(m.kickoff).split(" ").slice(0, 3).join(" ")}
-                    </p>
-                    <p className="text-xs font-semibold">
+                  <div className="mt-2 flex items-center justify-between text-xs text-muted">
+                    <span>
+                      {formatDay(m.kickoff).split(" ").slice(0, 3).join(" ")} ·{" "}
                       {formatTime(m.kickoff)}
-                    </p>
+                    </span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 font-semibold ${
+                        done
+                          ? "bg-primary/20 text-primary"
+                          : "bg-gold/20 text-gold"
+                      }`}
+                    >
+                      {done ? "✓ Pronostiqué" : "! À pronostiquer"}
+                    </span>
                   </div>
-                  <span
-                    className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${
-                      done
-                        ? "bg-primary/20 text-primary"
-                        : "bg-gold/20 text-gold"
-                    }`}
-                    title={done ? "Pronostiqué" : "À pronostiquer"}
-                  >
-                    {done ? "✓" : "!"}
-                  </span>
                 </Link>
               );
             })}
