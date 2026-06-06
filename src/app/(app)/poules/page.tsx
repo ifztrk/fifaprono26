@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { flagEmoji } from "@/lib/countries";
 import { computeStandings } from "@/lib/scoring";
+import { teamColor } from "@/lib/teamColors";
 import { arePreTournamentPredictionsLocked } from "@/lib/lock";
 import { saveGroupPredictionsAction } from "./actions";
 import SaveButton from "../SaveButton";
@@ -61,8 +62,16 @@ export default async function PoulesPage() {
           const pred = predMap.get(g);
 
           return (
-            <section key={g} className="card !p-3">
-              <h2 className="mb-2 text-lg font-bold">Groupe {g}</h2>
+            <section key={g} className="card relative overflow-hidden !p-3">
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-1"
+                style={{
+                  background: `linear-gradient(90deg, ${gTeams
+                    .map((t) => teamColor(t.code))
+                    .join(", ")})`,
+                }}
+              />
+              <h2 className="display mb-2 text-lg font-bold">Groupe {g}</h2>
 
               {/* Classement */}
               <table className="mb-3 w-full text-sm">
@@ -85,8 +94,15 @@ export default async function PoulesPage() {
                         }`}
                       >
                         <td className="py-1.5">
-                          <span className="mr-1 text-muted">{i + 1}</span>
-                          <span className="mr-1">{flagEmoji(r.code)}</span>
+                          <span className="mr-1.5 text-muted">{i + 1}</span>
+                          <span
+                            className="flag-badge mr-1.5 inline-grid size-6 align-middle text-sm"
+                            style={
+                              { "--tc": teamColor(r.code) } as React.CSSProperties
+                            }
+                          >
+                            {flagEmoji(r.code)}
+                          </span>
                           {r.name}
                         </td>
                         <td className="text-center">{r.played}</td>

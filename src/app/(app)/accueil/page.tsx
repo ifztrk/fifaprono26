@@ -3,7 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/leaderboard";
 import { flagEmoji } from "@/lib/countries";
-import { formatDay, formatTime, stageLabel } from "@/lib/format";
+import { teamColor } from "@/lib/teamColors";
+import { formatDay, formatTime } from "@/lib/format";
+import FlagMarquee from "../FlagMarquee";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +20,7 @@ export default async function AccueilPage() {
   const user = (await getCurrentUser())!;
   const now = new Date();
 
-  const [rows, upcoming, totalPreds, upcomingCount] = await Promise.all([
+  const [rows, upcoming, totalPreds, upcomingCount, teams] = await Promise.all([
     getLeaderboard(),
     prisma.match.findMany({
       where: { kickoff: { gt: now } },
@@ -28,6 +30,7 @@ export default async function AccueilPage() {
     }),
     prisma.matchPrediction.count({ where: { userId: user.id } }),
     prisma.match.count({ where: { kickoff: { gt: now } } }),
+    prisma.team.findMany({ select: { code: true }, orderBy: { name: "asc" } }),
   ]);
 
   const me = rows.find((r) => r.userId === user.id);
@@ -45,12 +48,22 @@ export default async function AccueilPage() {
     <div className="space-y-6">
       {/* Héro : salutation + rang/points */}
       <section className="card relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-8 -top-10 text-[7rem] opacity-10">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-1.5"
+          style={{
+            background:
+              "linear-gradient(90deg,#e23a4a,#ff8a1e,#ffce2b,#0bb04a,#2a6fe0,#9d1a4a)",
+          }}
+        />
+        <div className="bob pointer-events-none absolute -right-4 -top-2 text-7xl opacity-20">
           🏆
         </div>
-        <p className="text-sm text-muted">Salut {user.displayName} 👋</p>
+        <p className="text-sm text-muted">
+          Salut {flagEmoji(user.favoriteCode ?? "")} {user.displayName} 👋
+        </p>
         <h1 className="display mt-0.5 text-2xl font-extrabold">
           Prêt pour la <span className="gradient-text">Coupe du Monde</span> ?
+          🎉
         </h1>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
@@ -79,6 +92,9 @@ export default async function AccueilPage() {
         </div>
       </section>
 
+      {/* Guirlande des 48 nations */}
+      <FlagMarquee codes={teams.map((t) => t.code)} />
+
       {/* Prochains matchs */}
       <section>
         <div className="mb-3 flex items-end justify-between">
@@ -100,10 +116,25 @@ export default async function AccueilPage() {
                 <Link
                   key={m.id}
                   href="/matchs"
-                  className="card flex items-center gap-3 !py-3 transition hover:border-primary/50"
+                  className="card relative flex items-center gap-3 overflow-hidden !py-3 transition hover:border-primary/50"
                 >
+                  <div
+                    className="pointer-events-none absolute inset-x-0 top-0 h-1"
+                    style={{
+                      background: `linear-gradient(90deg, ${teamColor(
+                        m.homeTeam?.code,
+                      )}, ${teamColor(m.awayTeam?.code)})`,
+                    }}
+                  />
                   <div className="flex flex-1 items-center justify-center gap-2 text-sm font-semibold">
-                    <span className="text-xl">
+                    <span
+                      className="flag-badge size-8 text-lg"
+                      style={
+                        {
+                          "--tc": teamColor(m.homeTeam?.code),
+                        } as React.CSSProperties
+                      }
+                    >
                       {flagEmoji(m.homeTeam?.code ?? "")}
                     </span>
                     <span className="hidden sm:inline">
@@ -113,7 +144,14 @@ export default async function AccueilPage() {
                     <span className="hidden sm:inline">
                       {m.awayTeam?.name ?? "?"}
                     </span>
-                    <span className="text-xl">
+                    <span
+                      className="flag-badge size-8 text-lg"
+                      style={
+                        {
+                          "--tc": teamColor(m.awayTeam?.code),
+                        } as React.CSSProperties
+                      }
+                    >
                       {flagEmoji(m.awayTeam?.code ?? "")}
                     </span>
                   </div>

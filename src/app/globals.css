@@ -100,4 +100,47 @@ body {
     -webkit-appearance: none;
     margin: 0;
   }
+  .flag-badge {
+    @apply grid place-items-center rounded-full;
+    box-shadow: 0 0 0 2px var(--tc, var(--color-border));
+  }
+}
+
+/* Guirlande de drapeaux qui défile */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Confettis du bandeau d'accueil */
+@keyframes float-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(8deg);
+  }
+}
+.bob {
+  animation: float-bob 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee,
+  .bob {
+    animation: none;
+  }
 }

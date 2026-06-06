@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { flagEmoji } from "@/lib/countries";
+import { teamColor } from "@/lib/teamColors";
 import { dayKey, formatDay, formatTime, stageLabel } from "@/lib/format";
 import { savePredictionsAction } from "./actions";
 import SaveBar from "./SaveBar";
@@ -20,7 +21,12 @@ function Side({
 }) {
   const content = team ? (
     <>
-      <span className="text-2xl">{flagEmoji(team.code)}</span>
+      <span
+        className="flag-badge size-9 text-2xl"
+        style={{ "--tc": teamColor(team.code) } as React.CSSProperties}
+      >
+        {flagEmoji(team.code)}
+      </span>
       <span className="font-semibold">{team.name}</span>
     </>
   ) : (
@@ -104,7 +110,18 @@ export default async function MatchsPage() {
                 const pred = predMap.get(m.id);
 
                 return (
-                  <div key={m.id} className="card !p-3">
+                  <div
+                    key={m.id}
+                    className="card relative overflow-hidden !p-3"
+                  >
+                    <div
+                      className="pointer-events-none absolute inset-x-0 top-0 h-1"
+                      style={{
+                        background: `linear-gradient(90deg, ${teamColor(
+                          m.homeTeam?.code,
+                        )}, ${teamColor(m.awayTeam?.code)})`,
+                      }}
+                    />
                     <div className="mb-2 flex items-center justify-between text-xs text-muted">
                       <span>
                         {stageLabel(m.stage)}
