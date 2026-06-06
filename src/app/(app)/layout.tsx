@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { logoutAction } from "../(auth)/actions";
-import { flagEmoji } from "@/lib/countries";
 import ThemeToggle from "@/components/ThemeToggle";
+import TeamFlag from "@/components/TeamFlag";
 import Nav, { DesktopNav } from "./Nav";
 
 export default async function AppLayout({
@@ -35,9 +35,7 @@ export default async function AppLayout({
               href="/profil"
               className="flex items-center gap-1.5 rounded-full border border-border bg-surface-2/70 py-1 pl-1 pr-3 text-sm transition hover:border-primary/50"
             >
-              <span className="grid size-7 place-items-center rounded-full bg-background text-base">
-                {flagEmoji(user.favoriteCode ?? "")}
-              </span>
+              <TeamFlag code={user.favoriteCode} size={26} />
               <span className="hidden max-w-[8rem] truncate font-semibold sm:inline">
                 {user.displayName}
               </span>

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/leaderboard";
-import { countryName, flagEmoji } from "@/lib/countries";
+import { countryName } from "@/lib/countries";
+import TeamFlag from "@/components/TeamFlag";
 import { logoutAction } from "../../(auth)/actions";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export default async function ProfilPage() {
   return (
     <div className="space-y-5">
       <div className="card text-center">
-        <div className="text-6xl">{flagEmoji(user.favoriteCode ?? "")}</div>
+        <TeamFlag code={user.favoriteCode} size={80} className="mx-auto" />
         <h1 className="mt-2 text-2xl font-black">{user.displayName}</h1>
         <p className="text-sm text-muted">
           Coup de cœur : {countryName(user.favoriteCode)}

@@ -2,10 +2,11 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/leaderboard";
-import { flagEmoji } from "@/lib/countries";
 import { teamColor } from "@/lib/teamColors";
 import { formatDay, formatTime } from "@/lib/format";
 import FlagMarquee from "../FlagMarquee";
+import TeamFlag from "@/components/TeamFlag";
+import ExactCelebration from "./ExactCelebration";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,7 @@ export default async function AccueilPage() {
 
   return (
     <div className="space-y-6">
+      <ExactCelebration count={me?.exactCount ?? 0} />
       {/* Héro : salutation + rang/points */}
       <section className="card relative overflow-hidden">
         <div
@@ -58,8 +60,10 @@ export default async function AccueilPage() {
         <div className="bob pointer-events-none absolute -right-4 -top-2 text-7xl opacity-20">
           🏆
         </div>
-        <p className="text-sm text-muted">
-          Salut {flagEmoji(user.favoriteCode ?? "")} {user.displayName} 👋
+        <p className="flex items-center gap-1.5 text-sm text-muted">
+          Salut
+          <TeamFlag code={user.favoriteCode} size={18} ring={false} />
+          {user.displayName} 👋
         </p>
         <h1 className="display mt-0.5 text-2xl font-extrabold">
           Prêt pour la <span className="gradient-text">Coupe du Monde</span> ?
@@ -119,7 +123,7 @@ export default async function AccueilPage() {
                   className="card relative flex items-center gap-3 overflow-hidden !py-3 transition hover:border-primary/50"
                 >
                   <div
-                    className="pointer-events-none absolute inset-x-0 top-0 h-1"
+                    className="pointer-events-none absolute inset-x-0 top-0 h-1.5"
                     style={{
                       background: `linear-gradient(90deg, ${teamColor(
                         m.homeTeam?.code,
@@ -127,16 +131,7 @@ export default async function AccueilPage() {
                     }}
                   />
                   <div className="flex flex-1 items-center justify-center gap-2 text-sm font-semibold">
-                    <span
-                      className="flag-badge size-8 text-lg"
-                      style={
-                        {
-                          "--tc": teamColor(m.homeTeam?.code),
-                        } as React.CSSProperties
-                      }
-                    >
-                      {flagEmoji(m.homeTeam?.code ?? "")}
-                    </span>
+                    <TeamFlag code={m.homeTeam?.code} size={30} />
                     <span className="hidden sm:inline">
                       {m.homeTeam?.name ?? "?"}
                     </span>
@@ -144,16 +139,7 @@ export default async function AccueilPage() {
                     <span className="hidden sm:inline">
                       {m.awayTeam?.name ?? "?"}
                     </span>
-                    <span
-                      className="flag-badge size-8 text-lg"
-                      style={
-                        {
-                          "--tc": teamColor(m.awayTeam?.code),
-                        } as React.CSSProperties
-                      }
-                    >
-                      {flagEmoji(m.awayTeam?.code ?? "")}
-                    </span>
+                    <TeamFlag code={m.awayTeam?.code} size={30} />
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="text-xs text-muted">

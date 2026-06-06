@@ -1,7 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/leaderboard";
-import { flagEmoji } from "@/lib/countries";
-import { teamColor } from "@/lib/teamColors";
+import TeamFlag from "@/components/TeamFlag";
 
 export const dynamic = "force-dynamic";
 
@@ -34,14 +33,7 @@ export default async function ClassementPage() {
               <div className="w-8 shrink-0 text-center text-lg font-black">
                 {MEDALS[i] ?? <span className="text-muted">{i + 1}</span>}
               </div>
-              <div
-                className="flag-badge size-9 text-xl"
-                style={
-                  { "--tc": teamColor(r.favoriteCode) } as React.CSSProperties
-                }
-              >
-                {flagEmoji(r.favoriteCode ?? "")}
-              </div>
+              <TeamFlag code={r.favoriteCode} size={36} />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold">
                   {r.displayName}

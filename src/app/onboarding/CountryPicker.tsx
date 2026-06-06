@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { COUNTRIES, flagEmoji } from "@/lib/countries";
+import { COUNTRIES } from "@/lib/countries";
+import TeamFlag from "@/components/TeamFlag";
 import { saveFavoriteAction } from "./actions";
 
 export default function CountryPicker({
@@ -49,7 +50,7 @@ export default function CountryPicker({
                   : "border-border bg-surface-2 hover:border-primary/50"
               }`}
             >
-              <span className="text-xl">{flagEmoji(c.code)}</span>
+              <TeamFlag code={c.code} size={22} ring={false} />
               <span className="truncate">{c.name}</span>
             </button>
           );
@@ -66,9 +67,14 @@ export default function CountryPicker({
         disabled={!selected}
         className="btn-primary w-full"
       >
-        {selected
-          ? `C'est parti avec ${flagEmoji(selected)} !`
-          : "Choisis ton pays"}
+        {selected ? (
+          <>
+            C&apos;est parti avec
+            <TeamFlag code={selected} size={20} ring={false} />!
+          </>
+        ) : (
+          "Choisis ton pays"
+        )}
       </button>
     </form>
   );

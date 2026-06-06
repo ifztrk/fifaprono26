@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Outfit } from "next/font/google";
 import "./globals.css";
+import PitchLines from "@/components/PitchLines";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +45,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <PitchLines />
+        {children}
+      </body>
     </html>
   );
 }

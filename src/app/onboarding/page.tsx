@@ -14,7 +14,7 @@ export default async function OnboardingPage() {
           Bienvenue {user.displayName} !
         </h1>
         <p className="mt-2 text-muted">
-          Quel est ton <span className="text-accent font-semibold">pays
+          Quel est ton <span className="font-semibold text-primary">pays
           coup de cœur</span> pour cette Coupe du Monde ? Son drapeau
           s&apos;affichera à côté de ton nom dans le classement.
         </p>

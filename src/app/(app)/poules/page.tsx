@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { flagEmoji } from "@/lib/countries";
 import { computeStandings } from "@/lib/scoring";
 import { teamColor } from "@/lib/teamColors";
+import TeamFlag from "@/components/TeamFlag";
 import { arePreTournamentPredictionsLocked } from "@/lib/lock";
 import { saveGroupPredictionsAction } from "./actions";
 import SaveButton from "../SaveButton";
@@ -64,7 +65,7 @@ export default async function PoulesPage() {
           return (
             <section key={g} className="card relative overflow-hidden !p-3">
               <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-1"
+                className="pointer-events-none absolute inset-x-0 top-0 h-1.5"
                 style={{
                   background: `linear-gradient(90deg, ${gTeams
                     .map((t) => teamColor(t.code))
@@ -95,14 +96,11 @@ export default async function PoulesPage() {
                       >
                         <td className="py-1.5">
                           <span className="mr-1.5 text-muted">{i + 1}</span>
-                          <span
-                            className="flag-badge mr-1.5 inline-grid size-6 align-middle text-sm"
-                            style={
-                              { "--tc": teamColor(r.code) } as React.CSSProperties
-                            }
-                          >
-                            {flagEmoji(r.code)}
-                          </span>
+                          <TeamFlag
+                            code={r.code}
+                            size={20}
+                            className="mr-1.5 align-middle"
+                          />
                           {r.name}
                         </td>
                         <td className="text-center">{r.played}</td>
