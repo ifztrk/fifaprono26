@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Outfit } from "next/font/google";
 import "./globals.css";
 import PitchLines from "@/components/PitchLines";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,12 +19,19 @@ export const metadata: Metadata = {
   title: "FIFAPRONO 26 ⚽",
   description:
     "Pronostics entre amis pour la Coupe du Monde 2026 — scores, qualifiés de groupe et vainqueur final.",
+  applicationName: "FIFAPRONO 26",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "FIFAPRONO 26",
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b1220",
+  themeColor: "#15994f",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -47,6 +55,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full">
         <PitchLines />
+        <ServiceWorkerRegister />
         {children}
       </body>
     </html>
