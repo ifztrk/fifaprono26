@@ -9,6 +9,7 @@ import {
   saveSettingsAction,
   updateMatchAction,
 } from "./actions";
+import { resolveHelpRequestAction } from "./users-actions";
 import ResetPasswordButton from "./ResetPasswordButton";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export default async function AdminPage() {
   if (!user) redirect("/login");
   if (!user.isAdmin) redirect("/matchs");
 
-  const [matches, teams, settings, users] = await Promise.all([
+  const [matches, teams, settings, users, helpRequests] = await Promise.all([
     prisma.match.findMany({
       orderBy: { kickoff: "asc" },
       include: { homeTeam: true, awayTeam: true },
@@ -26,7 +27,10 @@ export default async function AdminPage() {
     prisma.team.findMany({ orderBy: [{ groupName: "asc" }, { name: "asc" }] }),
     getAllSettings(),
     prisma.user.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.helpRequest.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
+
+  const userByEmail = new Map(users.map((u) => [u.email, u]));
 
   const doublePoints = settings.doublePointsKnockout === "1";
 
@@ -39,6 +43,57 @@ export default async function AdminPage() {
           avancer la phase finale.
         </p>
       </div>
+
+      {/* Demandes « mot de passe oublié » */}
+      {helpRequests.length > 0 && (
+        <div>
+          <h2 className="mb-2 font-bold">
+            🔔 Demandes de mot de passe ({helpRequests.length})
+          </h2>
+          <div className="space-y-2">
+            {helpRequests.map((h) => {
+              const u = userByEmail.get(h.email.toLowerCase());
+              return (
+                <div key={h.id} className="card !p-3 ring-1 ring-gold/40">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">{h.email}</p>
+                      <p className="text-xs text-muted">
+                        {formatDay(h.createdAt)} · {formatTime(h.createdAt)}
+                      </p>
+                      {h.message && (
+                        <p className="mt-1 text-sm">“{h.message}”</p>
+                      )}
+                      {!u && (
+                        <p className="mt-1 text-xs text-danger">
+                          ⚠️ Aucun compte avec cet email.
+                        </p>
+                      )}
+                    </div>
+                    <form action={resolveHelpRequestAction} className="shrink-0">
+                      <input type="hidden" name="id" value={h.id} />
+                      <button
+                        type="submit"
+                        className="rounded-lg border border-border px-2.5 py-1.5 text-xs text-muted hover:text-foreground"
+                      >
+                        ✓ Traité
+                      </button>
+                    </form>
+                  </div>
+                  {u && (
+                    <div className="mt-2 flex justify-end border-t border-border/60 pt-2">
+                      <ResetPasswordButton
+                        userId={u.id}
+                        displayName={u.displayName}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Réglages */}
       <form action={saveSettingsAction} className="card space-y-3">

@@ -64,3 +64,27 @@ export async function logoutAction(): Promise<void> {
   await destroySession();
   redirect("/login");
 }
+
+export type HelpState = { ok?: boolean; error?: string };
+
+// Demande « mot de passe oublié » envoyée à l'admin (accessible sans connexion)
+export async function requestPasswordHelpAction(
+  _prev: HelpState,
+  formData: FormData,
+): Promise<HelpState> {
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  const message = String(formData.get("message") ?? "")
+    .trim()
+    .slice(0, 500);
+
+  if (!EMAIL_RE.test(email))
+    return { error: "Indique une adresse email valide." };
+
+  await prisma.helpRequest.create({
+    data: { email, message: message || null },
+  });
+
+  return { ok: true };
+}

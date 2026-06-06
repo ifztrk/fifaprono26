@@ -104,3 +104,11 @@ model Setting {
   key   String @id
   value String
 }
+
+// Demande d'aide « mot de passe oublié » envoyée à l'admin (depuis la page de connexion)
+model HelpRequest {
+  id        String   @id @default(cuid())
+  email     String
+  message   String?
+  createdAt DateTime @default(now())
+}

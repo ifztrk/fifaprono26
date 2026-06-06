@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import ForgotPassword from "../ForgotPassword";
 import { loginAction, type AuthState } from "../actions";
 
 export default function LoginPage() {
@@ -77,6 +78,8 @@ export default function LoginPage() {
           </Link>
         </p>
       </form>
+
+      <ForgotPassword />
     </main>
   );
 }

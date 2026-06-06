@@ -42,3 +42,15 @@ export async function resetPasswordAction(
   revalidatePath("/admin");
   return { password: temp, forName: target.displayName };
 }
+
+// Admin : marque une demande « mot de passe oublié » comme traitée (la supprime)
+export async function resolveHelpRequestAction(
+  formData: FormData,
+): Promise<void> {
+  const admin = await getCurrentUser();
+  if (!admin?.isAdmin) return;
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  await prisma.helpRequest.deleteMany({ where: { id } });
+  revalidatePath("/admin");
+}
