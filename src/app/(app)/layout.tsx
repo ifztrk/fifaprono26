@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import ThemeToggle from "@/components/ThemeToggle";
 import TeamFlag from "@/components/TeamFlag";
 import Nav, { DesktopNav } from "./Nav";
@@ -15,6 +16,14 @@ export default async function AppLayout({
   if (!user) redirect("/login");
   if (!user.onboarded) redirect("/onboarding");
 
+  // Messages non lus du mur (hors les siens) pour la pastille de navigation
+  const unread = await prisma.post.count({
+    where: {
+      userId: { not: user.id },
+      ...(user.lastSeenPosts ? { createdAt: { gt: user.lastSeenPosts } } : {}),
+    },
+  });
+
   return (
     <div className="mx-auto min-h-dvh max-w-3xl px-4 pb-28 pt-3 sm:pb-10">
       <TimeZoneSync />
@@ -28,7 +37,7 @@ export default async function AppLayout({
             </span>
           </Link>
 
-          <DesktopNav isAdmin={user.isAdmin} />
+          <DesktopNav isAdmin={user.isAdmin} unread={unread} />
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
@@ -47,7 +56,7 @@ export default async function AppLayout({
 
       {children}
 
-      <Nav isAdmin={user.isAdmin} />
+      <Nav isAdmin={user.isAdmin} unread={unread} />
     </div>
   );
 }

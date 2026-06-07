@@ -18,9 +18,10 @@ model User {
   passwordHash String
   displayName  String
   favoriteCode String? // code pays alpha-2 du "coup de cœur"
-  isAdmin      Boolean  @default(false)
-  onboarded    Boolean  @default(false)
-  createdAt    DateTime @default(now())
+  isAdmin       Boolean   @default(false)
+  onboarded     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  lastSeenPosts DateTime? // dernière consultation du mur (pour les non-lus)
 
   matchPredictions MatchPrediction[]
   groupPredictions GroupPrediction[]
@@ -28,6 +29,8 @@ model User {
   posts            Post[]
   snapshots        RankSnapshot[]
   pushSubs         PushSubscription[]
+  reactions        Reaction[]
+  mentions         Mention[]
 }
 
 model Team {
@@ -123,7 +126,36 @@ model Post {
   content   String
   createdAt DateTime @default(now())
 
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions Reaction[]
+  mentions  Mention[]
+}
+
+// Réaction emoji à un message
+model Reaction {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId, emoji])
+}
+
+// Mention d'un joueur dans un message
+model Mention {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // Instantané quotidien du total de points (pour le graphique d'évolution)
