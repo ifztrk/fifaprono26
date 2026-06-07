@@ -63,6 +63,10 @@ export async function saveSettingsAction(formData: FormData): Promise<void> {
   await assertAdmin();
   const doublePoints = formData.get("doublePointsKnockout") ? "1" : "0";
   await setSetting("doublePointsKnockout", doublePoints);
+
+  const registerCode = String(formData.get("registerCode") ?? "").trim();
+  await setSetting("registerCode", registerCode);
+
   await recomputeAllPoints();
   revalidatePath("/admin");
   revalidatePath("/classement");

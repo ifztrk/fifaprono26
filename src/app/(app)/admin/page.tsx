@@ -109,6 +109,24 @@ export default async function AdminPage() {
           />
           Doubler les points en phase à élimination directe (8es → finale)
         </label>
+
+        <div>
+          <label className="label" htmlFor="registerCode">
+            🔒 Code d&apos;invitation (laisser vide = inscription ouverte)
+          </label>
+          <input
+            id="registerCode"
+            name="registerCode"
+            type="text"
+            defaultValue={settings.registerCode ?? ""}
+            placeholder="ex : ALLEZ2026"
+            className="input"
+          />
+          <p className="mt-1 text-xs text-muted">
+            Si renseigné, seuls ceux qui ont ce code pourront créer un compte.
+          </p>
+        </div>
+
         <button type="submit" className="btn-primary">
           Enregistrer les réglages
         </button>

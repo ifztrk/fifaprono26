@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getSetting } from "@/lib/settings";
 import {
   createSession,
   destroySession,
@@ -28,6 +29,14 @@ export async function registerAction(
   if (!EMAIL_RE.test(email)) return { error: "Adresse email invalide." };
   if (password.length < 8)
     return { error: "Le mot de passe doit faire au moins 8 caractères." };
+
+  // Code d'invitation (si l'organisateur en a configuré un)
+  const requiredCode = (await getSetting("registerCode")).trim();
+  if (requiredCode) {
+    const code = String(formData.get("code") ?? "").trim();
+    if (code !== requiredCode)
+      return { error: "Code d'invitation incorrect. Demande-le à l'organisateur." };
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return { error: "Un compte existe déjà avec cet email." };

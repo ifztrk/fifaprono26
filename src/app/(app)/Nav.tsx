@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 
 type Item = { href: string; label: string; icon: string };
 
-// Barre du bas (mobile) : 5 onglets essentiels (Finale accessible via l'accueil)
+// Barre du bas (mobile) : 5 onglets essentiels.
+// Groupes & Finale restent accessibles via les cartes "Tes pronostics" de l'accueil.
 const MOBILE: Item[] = [
   { href: "/accueil", label: "Accueil", icon: "🏠" },
   { href: "/matchs", label: "Matchs", icon: "⚽" },
-  { href: "/poules", label: "Groupes", icon: "📊" },
   { href: "/classement", label: "Classement", icon: "🥇" },
   { href: "/chambrage", label: "Chambrage", icon: "💬" },
+  { href: "/profil", label: "Profil", icon: "👤" },
 ];
 
 // Barre du haut (desktop) : tout

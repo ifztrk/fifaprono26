@@ -4,6 +4,8 @@ import { prisma } from "./prisma";
 const DEFAULTS: Record<string, string> = {
   // "1" = points normaux en phase finale, "2" = points doublés (8e → finale)
   doublePointsKnockout: "0",
+  // Code d'invitation requis à l'inscription (vide = inscription ouverte)
+  registerCode: "",
 };
 
 export async function getSetting(key: string): Promise<string> {
