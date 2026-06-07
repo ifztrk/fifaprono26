@@ -24,7 +24,7 @@ export default async function ChambragePage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="display text-2xl font-extrabold">Discutons 💬</h1>
+        <h1 className="display text-2xl font-extrabold">Disfootons 💬</h1>
         <p className="text-sm text-muted">
           Le mur du groupe : vannes, pronos et mauvaise foi bienvenus.
         </p>

@@ -11,7 +11,7 @@ const MOBILE: Item[] = [
   { href: "/accueil", label: "Accueil", icon: "🏠" },
   { href: "/matchs", label: "Matchs", icon: "⚽" },
   { href: "/classement", label: "Classement", icon: "🥇" },
-  { href: "/chambrage", label: "Discutons", icon: "💬" },
+  { href: "/chambrage", label: "Disfootons", icon: "💬" },
   { href: "/profil", label: "Profil", icon: "👤" },
 ];
 
@@ -22,7 +22,7 @@ const DESKTOP: Item[] = [
   { href: "/poules", label: "Groupes", icon: "📊" },
   { href: "/finale", label: "Finale", icon: "🏆" },
   { href: "/classement", label: "Classement", icon: "🥇" },
-  { href: "/chambrage", label: "Discutons", icon: "💬" },
+  { href: "/chambrage", label: "Disfootons", icon: "💬" },
 ];
 
 function isActive(pathname: string, href: string) {
