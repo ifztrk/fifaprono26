@@ -7,6 +7,7 @@ import { formatDay, formatTime } from "@/lib/format";
 import { getTimeZone } from "@/lib/timezone";
 import FlagMarquee from "../FlagMarquee";
 import TeamFlag from "@/components/TeamFlag";
+import NotificationsButton from "@/components/NotificationsButton";
 import ExactCelebration from "./ExactCelebration";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +47,7 @@ export default async function AccueilPage() {
     teams,
     soonTotal,
     soonPredicted,
+    subCount,
   ] = await Promise.all([
     getTimeZone(),
     getLeaderboard(),
@@ -62,6 +64,7 @@ export default async function AccueilPage() {
     prisma.team.findMany({ select: { code: true }, orderBy: { name: "asc" } }),
     prisma.match.count({ where: soon }),
     prisma.matchPrediction.count({ where: { userId: user.id, match: soon } }),
+    prisma.pushSubscription.count({ where: { userId: user.id } }),
   ]);
 
   const me = rows.find((r) => r.userId === user.id);
@@ -143,6 +146,9 @@ export default async function AccueilPage() {
           </div>
         </div>
       </section>
+
+      {/* Invitation à activer les notifications (si jamais fait) */}
+      {subCount === 0 && <NotificationsButton />}
 
       {/* Guirlande des 48 nations */}
       <FlagMarquee codes={teams.map((t) => t.code)} />

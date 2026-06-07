@@ -5,7 +5,7 @@ import { countryName } from "@/lib/countries";
 import TeamFlag from "@/components/TeamFlag";
 import { logoutAction } from "../../(auth)/actions";
 import ChangePasswordForm from "./ChangePasswordForm";
-import NotificationsButton from "./NotificationsButton";
+import NotificationsButton from "@/components/NotificationsButton";
 
 export const dynamic = "force-dynamic";
 
