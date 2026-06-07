@@ -23,7 +23,7 @@ export default function PostForm() {
         maxLength={280}
         required
         className="input resize-none"
-        placeholder="Balance ta vanne, ton prono ou ton chambrage… 😏"
+        placeholder="Balance ta vanne, ton prono ou ton avis… 😏"
       />
       {state.error && <p className="text-sm text-danger">{state.error}</p>}
       <button type="submit" disabled={pending} className="btn-primary w-full">
