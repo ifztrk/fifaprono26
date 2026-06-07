@@ -38,8 +38,8 @@ export default function SaveBar() {
         {pending
           ? "Enregistrement…"
           : saved
-            ? "✅ Enregistré"
-            : "💾 Enregistrer mes pronos"}
+            ? "Enregistré"
+            : "Enregistrer mes pronos"}
       </button>
     </div>
   );
