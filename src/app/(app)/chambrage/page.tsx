@@ -5,6 +5,7 @@ import { formatDay, formatTime } from "@/lib/format";
 import TeamFlag from "@/components/TeamFlag";
 import PostForm from "./PostForm";
 import ReactionBar from "./ReactionBar";
+import ReplyButton from "./ReplyButton";
 import MarkSeen from "./MarkSeen";
 import { deletePostAction } from "./actions";
 
@@ -12,6 +13,12 @@ export const dynamic = "force-dynamic";
 
 function escapeRegex(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Extrait court d'un message (citation, bandeau de réponse…)
+function snippet(text: string, max = 80) {
+  const t = text.replace(/\s+/g, " ").trim();
+  return t.length > max ? t.slice(0, max - 1) + "…" : t;
 }
 
 // Surligne les @mentions dans le texte (mention de soi = surlignage fort)
@@ -29,7 +36,8 @@ function renderContent(
   while ((m = regex.exec(content)) !== null) {
     if (m.index > last) out.push(content.slice(last, m.index));
     const name = m[1];
-    const isMe = name.toLowerCase() === myLower;
+    const lower = name.toLowerCase();
+    const isMe = lower === myLower || lower === "tous";
     out.push(
       <span
         key={k++}
@@ -58,6 +66,12 @@ export default async function ChambragePage() {
       include: {
         user: { select: { displayName: true, favoriteCode: true } },
         reactions: { select: { emoji: true, userId: true } },
+        replyTo: {
+          select: {
+            content: true,
+            user: { select: { displayName: true } },
+          },
+        },
       },
     }),
     prisma.user.findMany({ select: { id: true, displayName: true } }),
@@ -68,8 +82,8 @@ export default async function ChambragePage() {
     .map((u) => u.displayName);
 
   // Regex de toutes les mentions possibles (noms les plus longs en premier)
-  const names = users
-    .map((u) => u.displayName)
+  // « tous » = @tous (ping général)
+  const names = ["tous", ...users.map((u) => u.displayName)]
     .sort((a, b) => b.length - a.length)
     .map(escapeRegex);
   const mentionRegex =
@@ -131,19 +145,38 @@ export default async function ChambragePage() {
                         .join(" ")}{" "}
                       {formatTime(p.createdAt, tz)}
                     </span>
-                    {(mine || me.isAdmin) && (
-                      <form action={deletePostAction} className="ml-auto">
-                        <input type="hidden" name="id" value={p.id} />
-                        <button
-                          type="submit"
-                          aria-label="Supprimer"
-                          className="text-xs text-muted hover:text-danger"
-                        >
-                          ✕
-                        </button>
-                      </form>
-                    )}
+                    <div className="ml-auto flex items-center gap-3">
+                      <ReplyButton
+                        id={p.id}
+                        author={p.user.displayName}
+                        snippet={snippet(p.content)}
+                      />
+                      {(mine || me.isAdmin) && (
+                        <form action={deletePostAction}>
+                          <input type="hidden" name="id" value={p.id} />
+                          <button
+                            type="submit"
+                            aria-label="Supprimer"
+                            className="text-xs text-muted hover:text-danger"
+                          >
+                            ✕
+                          </button>
+                        </form>
+                      )}
+                    </div>
                   </div>
+                  {p.replyTo && (
+                    <div className="mb-1.5 flex items-center gap-1.5 rounded-lg border-l-2 border-primary/50 bg-surface-2/50 px-2 py-1 text-xs">
+                      <span className="shrink-0 text-primary">↪</span>
+                      <span className="min-w-0 truncate text-muted">
+                        <span className="font-semibold text-foreground">
+                          {p.replyTo.user.displayName}
+                        </span>
+                        {" : "}
+                        {snippet(p.replyTo.content)}
+                      </span>
+                    </div>
+                  )}
                   <p className="whitespace-pre-wrap break-words text-[15px]">
                     {renderContent(p.content, mentionRegex, myLower)}
                   </p>

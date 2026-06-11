@@ -63,6 +63,26 @@ export default async function MatchsPage() {
   // (les matchs de phase finale apparaissent au fur et à mesure des qualifications).
   const visibleMatches = matches.filter((m) => m.homeTeam && m.awayTeam);
 
+  // Une fois le coup d'envoi passé, on peut voir les pronos de tout le monde.
+  const lockedIds = visibleMatches
+    .filter((m) => m.kickoff <= now)
+    .map((m) => m.id);
+  const allPreds =
+    lockedIds.length > 0
+      ? await prisma.matchPrediction.findMany({
+          where: { matchId: { in: lockedIds } },
+          include: {
+            user: { select: { displayName: true, favoriteCode: true } },
+          },
+        })
+      : [];
+  const predsByMatch = new Map<string, typeof allPreds>();
+  for (const p of allPreds) {
+    const arr = predsByMatch.get(p.matchId) ?? [];
+    arr.push(p);
+    predsByMatch.set(p.matchId, arr);
+  }
+
   if (visibleMatches.length === 0) {
     return (
       <div className="card text-center">
@@ -207,32 +227,99 @@ export default async function MatchsPage() {
                     </div>
 
                     {locked && (
-                      <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs">
-                        {pred ? (
-                          <span className="text-muted">
-                            Ton prono :{" "}
-                            <span className="font-semibold text-foreground">
-                              {pred.homeScore}-{pred.awayScore}
+                      <>
+                        <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs">
+                          {pred ? (
+                            <span className="text-muted">
+                              Ton prono :{" "}
+                              <span className="font-semibold text-foreground">
+                                {pred.homeScore}-{pred.awayScore}
+                              </span>
                             </span>
-                          </span>
-                        ) : (
-                          <span className="text-muted">Pas de prono 😴</span>
-                        )}
-                        {finished && pred && (
-                          <span
-                            className={`rounded-full px-2 py-0.5 font-bold ${
-                              pred.points >= 3
-                                ? "bg-primary/20 text-primary"
-                                : pred.points > 0
-                                  ? "bg-gold/20 text-gold"
-                                  : "bg-danger/20 text-danger"
-                            }`}
-                          >
-                            {pred.points >= 3 ? "🎯 " : ""}+{pred.points} pt
-                            {pred.points > 1 ? "s" : ""}
-                          </span>
-                        )}
-                      </div>
+                          ) : (
+                            <span className="text-muted">Pas de prono 😴</span>
+                          )}
+                          {finished && pred && (
+                            <span
+                              className={`rounded-full px-2 py-0.5 font-bold ${
+                                pred.points >= 3
+                                  ? "bg-primary/20 text-primary"
+                                  : pred.points > 0
+                                    ? "bg-gold/20 text-gold"
+                                    : "bg-danger/20 text-danger"
+                              }`}
+                            >
+                              {pred.points >= 3 ? "🎯 " : ""}+{pred.points} pt
+                              {pred.points > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
+
+                        {(() => {
+                          const all = [
+                            ...(predsByMatch.get(m.id) ?? []),
+                          ].sort((a, b) =>
+                            finished
+                              ? b.points - a.points ||
+                                a.user.displayName.localeCompare(
+                                  b.user.displayName,
+                                )
+                              : a.user.displayName.localeCompare(
+                                  b.user.displayName,
+                                ),
+                          );
+                          if (all.length === 0) return null;
+                          return (
+                            <details className="mt-2 border-t border-border/60 pt-2">
+                              <summary className="cursor-pointer select-none text-xs text-muted hover:text-foreground">
+                                👀 Voir les pronos ({all.length})
+                              </summary>
+                              <div className="mt-2 space-y-1">
+                                {all.map((p) => {
+                                  const meRow = p.userId === user.id;
+                                  return (
+                                    <div
+                                      key={p.id}
+                                      className="flex items-center gap-2 text-sm"
+                                    >
+                                      <TeamFlag
+                                        code={p.user.favoriteCode}
+                                        size={18}
+                                      />
+                                      <span
+                                        className={`min-w-0 flex-1 truncate ${
+                                          meRow
+                                            ? "font-semibold text-primary"
+                                            : ""
+                                        }`}
+                                      >
+                                        {p.user.displayName}
+                                        {meRow && " (toi)"}
+                                      </span>
+                                      <span className="shrink-0 font-bold tabular-nums">
+                                        {p.homeScore}-{p.awayScore}
+                                      </span>
+                                      {finished && (
+                                        <span
+                                          className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                                            p.points >= 3
+                                              ? "bg-primary/20 text-primary"
+                                              : p.points > 0
+                                                ? "bg-gold/20 text-gold"
+                                                : "bg-danger/20 text-danger"
+                                          }`}
+                                        >
+                                          +{p.points}
+                                        </span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </details>
+                          );
+                        })()}
+                      </>
                     )}
                   </div>
                 );

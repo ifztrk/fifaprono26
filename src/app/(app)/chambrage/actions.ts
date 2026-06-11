@@ -19,8 +19,17 @@ export async function postMessageAction(
   if (!content) return { error: "Écris un message." };
   if (content.length > 280) return { error: "280 caractères maximum." };
 
+  // Réponse éventuelle à un message existant (citation)
+  const replyToId = String(formData.get("replyToId") ?? "") || null;
+  const parent = replyToId
+    ? await prisma.post.findUnique({
+        where: { id: replyToId },
+        select: { id: true, userId: true },
+      })
+    : null;
+
   const post = await prisma.post.create({
-    data: { userId: user.id, content },
+    data: { userId: user.id, content, replyToId: parent?.id ?? null },
   });
 
   // Détection des @mentions (par pseudo, insensible à la casse)
@@ -32,22 +41,37 @@ export async function postMessageAction(
   const mentioned = others.filter((u) =>
     lower.includes("@" + u.displayName.toLowerCase()),
   );
+  // @tous : ping tout le monde
+  const pingAll = /@tous\b/i.test(content);
 
   if (mentioned.length > 0) {
     await prisma.mention.createMany({
       data: mentioned.map((u) => ({ postId: post.id, userId: u.id })),
     });
-    // Notification push aux mentionnés
-    await Promise.all(
-      mentioned.map((u) =>
-        sendToUser(u.id, {
-          title: "FIFAPRONO 26 💬",
-          body: `${user.displayName} t'a mentionné dans Disfootons`,
-          url: "/chambrage",
-        }),
-      ),
+  }
+
+  // Destinataires des notifications push (userId → corps du message).
+  // Priorité : @mention > @tous, et la réponse ne double pas une mention.
+  const targets = new Map<string, string>();
+  if (pingAll) {
+    for (const u of others)
+      targets.set(u.id, `${user.displayName} a pingé tout le monde 📣`);
+  }
+  for (const u of mentioned) {
+    targets.set(u.id, `${user.displayName} t'a mentionné dans Disfootons`);
+  }
+  if (parent && parent.userId !== user.id && !targets.has(parent.userId)) {
+    targets.set(
+      parent.userId,
+      `${user.displayName} t'a répondu dans Disfootons`,
     );
   }
+
+  await Promise.all(
+    [...targets].map(([id, body]) =>
+      sendToUser(id, { title: "FIFAPRONO 26 💬", body, url: "/chambrage" }),
+    ),
+  );
 
   revalidatePath("/chambrage");
   return { ok: true };

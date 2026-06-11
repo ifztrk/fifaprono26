@@ -126,9 +126,17 @@ model Post {
   content   String
   createdAt DateTime @default(now())
 
+  // Réponse à un autre message (citation). Si le parent est supprimé, on garde
+  // le message mais on perd la citation (SetNull).
+  replyToId String?
+  replyTo   Post?   @relation("PostReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Post[]  @relation("PostReplies")
+
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   reactions Reaction[]
   mentions  Mention[]
+
+  @@index([replyToId])
 }
 
 // Réaction emoji à un message
