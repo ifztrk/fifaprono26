@@ -80,6 +80,7 @@ export default async function ChambragePage() {
   const friends = users
     .filter((u) => u.id !== me.id)
     .map((u) => u.displayName);
+  const nameById = new Map(users.map((u) => [u.id, u.displayName]));
 
   // Regex de toutes les mentions possibles (noms les plus longs en premier)
   // « tous » = @tous (ping général)
@@ -119,9 +120,13 @@ export default async function ChambragePage() {
           posts.map((p, i) => {
             const mine = p.userId === me.id;
             const counts: Record<string, number> = {};
+            const reactionNames: Record<string, string[]> = {};
             const myReactions = new Set<string>();
             for (const r of p.reactions) {
               counts[r.emoji] = (counts[r.emoji] ?? 0) + 1;
+              (reactionNames[r.emoji] ??= []).push(
+                r.userId === me.id ? "toi" : (nameById.get(r.userId) ?? "?"),
+              );
               if (r.userId === me.id) myReactions.add(r.emoji);
             }
             return (
@@ -184,6 +189,7 @@ export default async function ChambragePage() {
                     postId={p.id}
                     counts={counts}
                     mine={myReactions}
+                    names={reactionNames}
                   />
                 </div>
               </div>

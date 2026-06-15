@@ -123,10 +123,18 @@ export default async function MatchsPage() {
       <div className="space-y-6">
         {days.map((day) => (
           <section key={day.key}>
-            <h2 className="mb-2 text-sm font-bold capitalize text-muted">
-              {formatDay(day.date, tz)}
-            </h2>
-            <div className="space-y-2.5">
+            <details
+              open={day.matches.some((mm) => mm.kickoff > now)}
+              className="[&[open]>summary>.j-when]:hidden"
+            >
+              <summary className="mb-2 cursor-pointer select-none text-sm font-bold capitalize text-muted marker:text-muted hover:text-foreground">
+                {formatDay(day.date, tz)}
+                <span className="j-when ml-1 text-xs font-normal normal-case text-muted">
+                  · terminé · {day.matches.length} match
+                  {day.matches.length > 1 ? "s" : ""}
+                </span>
+              </summary>
+              <div className="space-y-2.5">
               {day.matches.map((m) => {
                 const locked = m.kickoff <= now;
                 const finished =
@@ -324,7 +332,8 @@ export default async function MatchsPage() {
                   </div>
                 );
               })}
-            </div>
+              </div>
+            </details>
           </section>
         ))}
       </div>
