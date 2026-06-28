@@ -36,6 +36,96 @@ export default async function AdminPage() {
 
   const doublePoints = settings.doublePointsKnockout === "1";
 
+  // Formulaire de saisie d'un match (réutilisé pour « à valider » et « validés »)
+  const renderMatchForm = (m: (typeof matches)[number]) => {
+    const isKnockout = m.stage !== "GROUP";
+    return (
+      <form key={m.id} action={updateMatchAction} className="card !p-3">
+        <input type="hidden" name="matchId" value={m.id} />
+        <div className="mb-2 flex items-center justify-between text-xs text-muted">
+          <span>
+            #{m.number} · {stageLabel(m.stage)}
+            {m.groupName ? ` · Gr. ${m.groupName}` : ""}
+          </span>
+          <span>
+            {formatDay(m.kickoff, tz)} {formatTime(m.kickoff, tz)}
+          </span>
+        </div>
+
+        {isKnockout ? (
+          <div className="mb-2 grid grid-cols-2 gap-2">
+            <select
+              name="homeTeamId"
+              defaultValue={m.homeTeamId ?? ""}
+              className="input text-sm"
+            >
+              <option value="">{m.homeLabel ?? "Équipe domicile"}</option>
+              {teams.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {flagEmoji(t.code)} {t.name}
+                </option>
+              ))}
+            </select>
+            <select
+              name="awayTeamId"
+              defaultValue={m.awayTeamId ?? ""}
+              className="input text-sm"
+            >
+              <option value="">{m.awayLabel ?? "Équipe extérieur"}</option>
+              {teams.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {flagEmoji(t.code)} {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div className="mb-2 flex items-center justify-between text-sm font-semibold">
+            <span>
+              {m.homeTeam
+                ? `${flagEmoji(m.homeTeam.code)} ${m.homeTeam.name}`
+                : "?"}
+            </span>
+            <span>
+              {m.awayTeam
+                ? `${m.awayTeam.name} ${flagEmoji(m.awayTeam.code)}`
+                : "?"}
+            </span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            inputMode="numeric"
+            name="homeScore"
+            min={0}
+            defaultValue={m.homeScore ?? ""}
+            placeholder="-"
+            className="input w-14 text-center font-bold"
+          />
+          <span className="text-muted">-</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            name="awayScore"
+            min={0}
+            defaultValue={m.awayScore ?? ""}
+            placeholder="-"
+            className="input w-14 text-center font-bold"
+          />
+          <button type="submit" className="btn-primary ml-auto !py-2">
+            {m.finished ? "Modifier" : "Valider"}
+          </button>
+        </div>
+      </form>
+    );
+  };
+
+  // Matchs à valider d'abord, matchs déjà validés archivés (plus récents d'abord)
+  const pendingMatches = matches.filter((m) => !m.finished);
+  const validatedMatches = matches.filter((m) => m.finished).reverse();
+
   return (
     <div className="space-y-5">
       <div>
@@ -173,103 +263,33 @@ export default async function AdminPage() {
         </div>
       </div>
 
-      {/* Matchs */}
+      {/* Matchs à valider */}
       <div>
-        <h2 className="mb-2 font-bold">Matchs ({matches.length})</h2>
-        <div className="space-y-2">
-          {matches.map((m) => {
-            const isKnockout = m.stage !== "GROUP";
-            return (
-              <form
-                key={m.id}
-                action={updateMatchAction}
-                className="card !p-3"
-              >
-                <input type="hidden" name="matchId" value={m.id} />
-                <div className="mb-2 flex items-center justify-between text-xs text-muted">
-                  <span>
-                    #{m.number} · {stageLabel(m.stage)}
-                    {m.groupName ? ` · Gr. ${m.groupName}` : ""}
-                  </span>
-                  <span>
-                    {formatDay(m.kickoff, tz)} {formatTime(m.kickoff, tz)}
-                  </span>
-                </div>
+        <h2 className="mb-2 font-bold">
+          Matchs à valider ({pendingMatches.length})
+        </h2>
+        {pendingMatches.length === 0 ? (
+          <p className="card text-center text-sm text-muted">
+            Tous les matchs sont validés 🎉
+          </p>
+        ) : (
+          <div className="space-y-2">{pendingMatches.map(renderMatchForm)}</div>
+        )}
 
-                {isKnockout ? (
-                  <div className="mb-2 grid grid-cols-2 gap-2">
-                    <select
-                      name="homeTeamId"
-                      defaultValue={m.homeTeamId ?? ""}
-                      className="input text-sm"
-                    >
-                      <option value="">
-                        {m.homeLabel ?? "Équipe domicile"}
-                      </option>
-                      {teams.map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {flagEmoji(t.code)} {t.name}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      name="awayTeamId"
-                      defaultValue={m.awayTeamId ?? ""}
-                      className="input text-sm"
-                    >
-                      <option value="">
-                        {m.awayLabel ?? "Équipe extérieur"}
-                      </option>
-                      {teams.map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {flagEmoji(t.code)} {t.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ) : (
-                  <div className="mb-2 flex items-center justify-between text-sm font-semibold">
-                    <span>
-                      {m.homeTeam
-                        ? `${flagEmoji(m.homeTeam.code)} ${m.homeTeam.name}`
-                        : "?"}
-                    </span>
-                    <span>
-                      {m.awayTeam
-                        ? `${m.awayTeam.name} ${flagEmoji(m.awayTeam.code)}`
-                        : "?"}
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    name="homeScore"
-                    min={0}
-                    defaultValue={m.homeScore ?? ""}
-                    placeholder="-"
-                    className="input w-14 text-center font-bold"
-                  />
-                  <span className="text-muted">-</span>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    name="awayScore"
-                    min={0}
-                    defaultValue={m.awayScore ?? ""}
-                    placeholder="-"
-                    className="input w-14 text-center font-bold"
-                  />
-                  <button type="submit" className="btn-primary ml-auto !py-2">
-                    {m.finished ? "Modifier" : "Valider"}
-                  </button>
-                </div>
-              </form>
-            );
-          })}
-        </div>
+        {validatedMatches.length > 0 && (
+          <details className="mt-4">
+            <summary className="cursor-pointer select-none font-bold text-muted marker:text-muted hover:text-foreground">
+              ✅ Matchs validés ({validatedMatches.length})
+            </summary>
+            <p className="mt-1 text-xs text-muted">
+              Les plus récents d&apos;abord. Tu peux toujours corriger un score
+              ici.
+            </p>
+            <div className="mt-2 space-y-2">
+              {validatedMatches.map(renderMatchForm)}
+            </div>
+          </details>
+        )}
       </div>
     </div>
   );
