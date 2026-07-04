@@ -2,7 +2,7 @@ import "server-only";
 import { prisma } from "./prisma";
 
 const DEFAULTS: Record<string, string> = {
-  // "1" = points normaux en phase finale, "2" = points doublés (8e → finale)
+  // "1" = points des 8es de finale (huitièmes) doublés ; sinon points normaux partout
   doublePointsKnockout: "0",
   // Code d'invitation requis à l'inscription (vide = inscription ouverte)
   registerCode: "",
@@ -28,8 +28,9 @@ export async function getAllSettings(): Promise<Record<string, string>> {
   return map;
 }
 
-// Multiplicateur de points selon la phase et le réglage "double points"
+// Multiplicateur de points selon la phase et le réglage "double points".
+// Quand activé, seuls les 8es de finale (huitièmes, stage "R16") comptent double.
 export function stageMultiplier(stage: string, doublePoints: boolean): number {
   if (!doublePoints) return 1;
-  return stage === "GROUP" ? 1 : 2;
+  return stage === "R16" ? 2 : 1;
 }

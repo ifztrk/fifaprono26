@@ -197,7 +197,7 @@ export default async function AdminPage() {
             defaultChecked={doublePoints}
             className="size-5 accent-[var(--color-primary)]"
           />
-          Doubler les points en phase à élimination directe (8es → finale)
+          Doubler les points des 8es de finale (huitièmes) uniquement
         </label>
 
         <div>
