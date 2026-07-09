@@ -62,6 +62,9 @@ model Match {
   homeScore Int?
   awayScore Int?
   finished  Boolean @default(false)
+  // Qualifié aux tirs au but quand un match à élimination directe finit sur un nul :
+  // "HOME" ou "AWAY" (null si sans objet). N'affecte pas le calcul des points.
+  shootoutWinner String?
 
   predictions MatchPrediction[]
 }

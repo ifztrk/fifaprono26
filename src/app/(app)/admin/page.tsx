@@ -118,6 +118,25 @@ export default async function AdminPage() {
             {m.finished ? "Modifier" : "Valider"}
           </button>
         </div>
+
+        {isKnockout && m.homeTeam && m.awayTeam && (
+          <div className="mt-2 flex items-center gap-2 border-t border-border/60 pt-2 text-xs">
+            <span className="shrink-0 text-muted">Qualifié si nul (t.a.b.) :</span>
+            <select
+              name="shootoutWinner"
+              defaultValue={m.shootoutWinner ?? ""}
+              className="input !py-1 text-xs"
+            >
+              <option value="">—</option>
+              <option value="HOME">
+                {flagEmoji(m.homeTeam.code)} {m.homeTeam.name}
+              </option>
+              <option value="AWAY">
+                {flagEmoji(m.awayTeam.code)} {m.awayTeam.name}
+              </option>
+            </select>
+          </div>
+        )}
       </form>
     );
   };

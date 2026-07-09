@@ -22,6 +22,7 @@ export async function updateMatchAction(formData: FormData): Promise<void> {
   const awayTeamId = String(formData.get("awayTeamId") ?? "");
   const rawHome = String(formData.get("homeScore") ?? "");
   const rawAway = String(formData.get("awayScore") ?? "");
+  const rawShootout = String(formData.get("shootoutWinner") ?? "");
 
   const data: {
     homeTeamId?: string | null;
@@ -29,6 +30,7 @@ export async function updateMatchAction(formData: FormData): Promise<void> {
     homeScore?: number | null;
     awayScore?: number | null;
     finished?: boolean;
+    shootoutWinner?: string | null;
   } = {};
 
   // Affectation des équipes (phase à élimination directe)
@@ -43,11 +45,17 @@ export async function updateMatchAction(formData: FormData): Promise<void> {
       data.homeScore = h;
       data.awayScore = a;
       data.finished = true;
+      // Qualifié aux t.a.b. : pertinent seulement si le match finit sur un nul
+      data.shootoutWinner =
+        h === a && (rawShootout === "HOME" || rawShootout === "AWAY")
+          ? rawShootout
+          : null;
     }
   } else {
     data.homeScore = null;
     data.awayScore = null;
     data.finished = false;
+    data.shootoutWinner = null;
   }
 
   await prisma.match.update({ where: { id: matchId }, data });

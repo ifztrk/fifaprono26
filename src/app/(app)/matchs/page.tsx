@@ -222,6 +222,20 @@ export default async function MatchsPage() {
           />
         </div>
 
+        {finished &&
+          m.stage !== "GROUP" &&
+          m.homeScore === m.awayScore &&
+          m.shootoutWinner &&
+          (() => {
+            const q = m.shootoutWinner === "HOME" ? m.homeTeam : m.awayTeam;
+            if (!q) return null;
+            return (
+              <p className="mt-1.5 text-center text-xs font-semibold text-primary">
+                🎟️ {q.name} qualifié aux t.a.b.
+              </p>
+            );
+          })()}
+
         {locked && (
           <>
             <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-border/60 pt-2 text-xs">
