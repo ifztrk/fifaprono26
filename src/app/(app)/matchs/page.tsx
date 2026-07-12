@@ -470,8 +470,8 @@ export default async function MatchsPage() {
       <div className="mb-4">
         <h1 className="display text-2xl font-extrabold">Les matchs ⚽</h1>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
-          <span className="chip">🎯 Exact = 3 pts</span>
-          <span className="chip">✅ Bon résultat = 1 pt</span>
+          <span className="chip">🎯 Score exact · ✅ Bon résultat</span>
+          <span className="chip">🔥 Points renforcés en phase finale</span>
           <span className="chip">🔒 Verrou au coup d&apos;envoi</span>
           <span className="chip">🕒 Heures dans ton fuseau</span>
         </div>

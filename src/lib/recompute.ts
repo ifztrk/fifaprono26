@@ -1,10 +1,11 @@
 import "server-only";
 import { prisma } from "./prisma";
-import { getAllSettings, stageMultiplier } from "./settings";
+import { getAllSettings } from "./settings";
 import {
   computeStandings,
   groupPoints,
   matchPoints,
+  stageScoring,
   SCORING,
 } from "./scoring";
 
@@ -23,7 +24,7 @@ export async function recomputeAllPoints(): Promise<void> {
     for (const m of matches) {
       const done =
         m.finished && m.homeScore !== null && m.awayScore !== null;
-      const mult = stageMultiplier(m.stage, doublePoints);
+      const { exact, outcome } = stageScoring(m.stage, doublePoints);
       for (const p of m.predictions) {
         const pts = done
           ? matchPoints(
@@ -31,7 +32,8 @@ export async function recomputeAllPoints(): Promise<void> {
               p.awayScore,
               m.homeScore!,
               m.awayScore!,
-              mult,
+              exact,
+              outcome,
             )
           : 0;
         if (pts !== p.points) {

@@ -15,21 +15,42 @@ function outcome(home: number, away: number): -1 | 0 | 1 {
   return 0;
 }
 
-// Points d'un pronostic de match face au résultat réel
+// Barème renforcé et progressif en phase finale, appliqué quand le boost est
+// activé (réglage "double points"). Hors boost, tout reste à 3/1.
+const BOOSTED_STAGE_SCORING: Record<
+  string,
+  { exact: number; outcome: number }
+> = {
+  R16: { exact: 6, outcome: 2 }, // 8es
+  QF: { exact: 8, outcome: 4 }, // quarts
+  SF: { exact: 12, outcome: 6 }, // demies
+  THIRD: { exact: 12, outcome: 6 }, // petite finale
+  FINAL: { exact: 20, outcome: 10 }, // finale
+};
+
+// Barème (exact / bon résultat) pour une phase donnée
+export function stageScoring(
+  stage: string,
+  boosted: boolean,
+): { exact: number; outcome: number } {
+  if (boosted && BOOSTED_STAGE_SCORING[stage])
+    return BOOSTED_STAGE_SCORING[stage];
+  return { exact: SCORING.EXACT, outcome: SCORING.OUTCOME };
+}
+
+// Points d'un pronostic de match face au résultat réel, selon le barème fourni
 export function matchPoints(
   predHome: number,
   predAway: number,
   realHome: number,
   realAway: number,
-  multiplier = 1,
+  exactPts: number = SCORING.EXACT,
+  outcomePts: number = SCORING.OUTCOME,
 ): number {
-  let pts = 0;
-  if (predHome === realHome && predAway === realAway) {
-    pts = SCORING.EXACT;
-  } else if (outcome(predHome, predAway) === outcome(realHome, realAway)) {
-    pts = SCORING.OUTCOME;
-  }
-  return pts * multiplier;
+  if (predHome === realHome && predAway === realAway) return exactPts;
+  if (outcome(predHome, predAway) === outcome(realHome, realAway))
+    return outcomePts;
+  return 0;
 }
 
 // ---- Classements de poule calculés depuis les matchs terminés ----

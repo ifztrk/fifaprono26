@@ -1,6 +1,5 @@
 import "server-only";
 import { prisma } from "./prisma";
-import { SCORING } from "./scoring";
 
 export type LeaderboardRow = {
   userId: string;
@@ -17,7 +16,13 @@ export type LeaderboardRow = {
 export async function getLeaderboard(): Promise<LeaderboardRow[]> {
   const users = await prisma.user.findMany({
     include: {
-      matchPredictions: true,
+      matchPredictions: {
+        include: {
+          match: {
+            select: { homeScore: true, awayScore: true, finished: true },
+          },
+        },
+      },
       groupPredictions: true,
       longPrediction: true,
     },
@@ -27,10 +32,15 @@ export async function getLeaderboard(): Promise<LeaderboardRow[]> {
     const matchPoints = u.matchPredictions.reduce((s, p) => s + p.points, 0);
     const groupPoints = u.groupPredictions.reduce((s, p) => s + p.points, 0);
     const longPoints = u.longPrediction?.points ?? 0;
-    // Un score exact rapporte au moins SCORING.EXACT (3), le bon résultat au plus 2
-    // (1 × multiplicateur) → points >= 3 ⇒ score exact trouvé.
+    // Score exact = pronostic identique au résultat réel (indépendant du barème,
+    // car un « bon résultat » en phase finale peut valoir ≥ 3 pts).
     const exactCount = u.matchPredictions.filter(
-      (p) => p.points >= SCORING.EXACT,
+      (p) =>
+        p.match.finished &&
+        p.match.homeScore !== null &&
+        p.match.awayScore !== null &&
+        p.homeScore === p.match.homeScore &&
+        p.awayScore === p.match.awayScore,
     ).length;
     return {
       userId: u.id,

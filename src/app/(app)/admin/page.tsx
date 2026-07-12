@@ -216,7 +216,8 @@ export default async function AdminPage() {
             defaultChecked={doublePoints}
             className="size-5 accent-[var(--color-primary)]"
           />
-          Doubler les points des 8es et des quarts de finale
+          Barème renforcé en phase finale (8es 6 · quarts 8 · demies 12 ·
+          finale 20 pts pour un score exact)
         </label>
 
         <div>
