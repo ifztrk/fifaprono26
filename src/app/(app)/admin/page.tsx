@@ -216,7 +216,7 @@ export default async function AdminPage() {
             defaultChecked={doublePoints}
             className="size-5 accent-[var(--color-primary)]"
           />
-          Doubler les points des 8es de finale (huitièmes) uniquement
+          Doubler les points des 8es et des quarts de finale
         </label>
 
         <div>
