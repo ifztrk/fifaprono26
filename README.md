@@ -1,6 +1,6 @@
 # FIFAPRONO 26 ⚽🏆
 
-Application web de **pronostics de la Coupe du Monde 2026**, à faire entre amis : chacun devine les scores des matchs, les points se calculent automatiquement, et un classement se met à jour en direct — avec un espace de discussion pour se chambrer.
+Application web de **pronostics de la Coupe du Monde 2026**, à faire entre amis et en famille : chacun devine les scores des matchs, les points se calculent automatiquement, et un classement se met à jour en direct — avec un espace de discussion pour se chambrer.
 
 > Projet de 1re année de Bachelor · IPSSI — Inès Ozturk
 
