@@ -45,3 +45,6 @@ next-env.d.ts
 .db-claim-url.txt
 .env*.local
 .env.local
+
+# Livrables de soutenance (captures + PDF contenant des données réelles)
+docs/
