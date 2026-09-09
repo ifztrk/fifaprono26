@@ -1,65 +1,52 @@
-# FIFAPRONO 26 ⚽
+# FIFAPRONO 26 ⚽🏆
 
-Application de pronostics entre amis pour la **Coupe du Monde 2026**.
-Chacun pronostique les scores des matchs, les qualifiés de chaque poule et le
-vainqueur final ; les points se calculent automatiquement et un classement met
-tout le monde en compétition.
+Application web de **pronostics de la Coupe du Monde 2026**, à faire entre amis : chacun devine les scores des matchs, les points se calculent automatiquement, et un classement se met à jour en direct — avec un espace de discussion pour se chambrer.
 
-## Fonctionnalités
+> Projet de 1re année de Bachelor · IPSSI — Inès Ozturk
 
-- 🔐 **Connexion** par email + mot de passe (le 1er inscrit devient admin)
-- 🌍 **Pays coup de cœur** demandé à la première connexion (drapeau affiché dans le classement)
-- ⚽ **Pronostics de scores** verrouillés automatiquement au coup d'envoi de chaque match
-- 📊 **Qualifiés de poule** : classements de groupe calculés en direct + pronostic 1er/2e
-- 🏆 **Vainqueur final + finaliste** (pronostic avant le tournoi)
-- 🥇 **Classement temps réel** avec scores exacts et drapeaux
-- 👤 **Profil** avec stats et badges
-- 🛠️ **Panneau admin** pour saisir les résultats (recalcul automatique des points)
+![Présentation du projet](assets/slides/01-titre.png)
 
-### Barème
+## ✨ Fonctionnalités
 
-| Pronostic | Points |
-|---|---|
-| Score exact | **3 pts** |
-| Bon résultat (V/N/D) | **1 pt** |
-| Équipe correctement qualifiée d'une poule | **2 pts** (× équipe) |
-| Bon vainqueur de la Coupe | **10 pts** |
-| Bon finaliste | **5 pts** |
+- 🎯 **Pronostics** des matchs, des qualifiés de poule et du vainqueur final
+- 🏆 **Calcul automatique des points**, avec un barème renforcé en phase finale
+- 🥇 **Classement en direct** (podium + rangs)
+- 💬 **Chat** entre joueurs (mentions, réactions, réponses)
+- 🔔 **Notifications** et **installation sur mobile** (PWA)
+- 🛠️ **Espace administrateur** pour saisir les scores et gérer les joueurs
 
-Option admin : **doubler les points** en phase à élimination directe.
+![Fonctionnalités](assets/slides/02-fonctionnalites.png)
 
-## Stack technique
+## 🧱 Technologies utilisées
 
-- **Next.js 16** (App Router) + **React 19** + **TypeScript**
-- **Tailwind CSS 4**
-- **Prisma 6** + **PostgreSQL**
-- Auth maison (JWT via `jose` + `bcryptjs`)
-- Déploiement **Vercel**
+- **Next.js / React** — les pages et l'interface
+- **Prisma + PostgreSQL** — la base de données (hébergée sur Neon)
+- **Tailwind CSS** — la mise en forme (mode clair / sombre)
+- **Vercel** — l'hébergement et la mise en ligne
 
-## Développement local
+![Architecture](assets/slides/03-architecture.png)
+
+## 🎯 Le calcul des points
+
+Le cœur du projet : chaque pronostic est comparé au résultat réel, les points sont attribués, puis tout le classement est recalculé automatiquement. Les grands matchs rapportent plus de points.
+
+![Le calcul des points](assets/slides/04-calcul-points.png)
+
+## 🛠️ La démarche
+
+Construite étape par étape et améliorée au fil des retours des joueurs, l'application a été utilisée pour de vrai pendant tout le tournoi.
+
+![La démarche](assets/slides/05-demarche.png)
+
+## 🚀 Lancer le projet en local
 
 ```bash
 npm install
-# Renseigner DATABASE_URL, DIRECT_URL et AUTH_SECRET dans .env
-npx prisma migrate dev      # crée les tables
-npm run seed                # charge les 48 équipes + le calendrier
-npm run dev                 # http://localhost:3000
+npm run dev
 ```
 
-## Variables d'environnement
+L'application a besoin de quelques variables d'environnement (base de données, etc.) dans un fichier `.env`, non inclus dans le dépôt pour des raisons de sécurité.
 
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | Chaîne de connexion Postgres |
-| `DIRECT_URL` | Connexion directe (identique à DATABASE_URL si pas de pooling) |
-| `AUTH_SECRET` | Secret aléatoire pour signer les sessions (`openssl rand -base64 48`) |
+---
 
-## Déploiement sur Vercel
-
-1. `vercel login` puis `vercel link`
-2. Provisionner une base Postgres (Vercel Storage → Neon, ou Prisma Postgres)
-3. Ajouter `DATABASE_URL`, `DIRECT_URL`, `AUTH_SECRET` dans les variables d'environnement Vercel
-4. `vercel --prod` — le build applique les migrations (`prisma migrate deploy`) automatiquement
-5. Lancer le seed une fois : `npm run seed` (avec `DATABASE_URL` pointant sur la prod)
-
-Le premier compte créé est automatiquement **administrateur**.
+Projet réalisé dans le cadre de ma 1re année de Bachelor à l'IPSSI.
