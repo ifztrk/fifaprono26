@@ -7,8 +7,10 @@ export const dynamic = "force-dynamic";
 // Appelé par le cron Vercel (1×/jour) : rappelle aux joueurs abonnés
 // les matchs des prochaines 24h qu'ils n'ont pas encore pronostiqués.
 export async function GET(req: Request) {
+  // Sécurité : sans CRON_SECRET configuré, l'endpoint est fermé (401).
+  // Vercel Cron envoie automatiquement l'en-tête « Authorization: Bearer <CRON_SECRET> ».
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get("authorization") !== `Bearer ${secret}`)
+  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`)
     return NextResponse.json({ error: "non autorisé" }, { status: 401 });
 
   const now = new Date();

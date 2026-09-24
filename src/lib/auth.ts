@@ -5,9 +5,18 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 const COOKIE = "fp_session";
-const secret = new TextEncoder().encode(
-  process.env.AUTH_SECRET ?? "insecure-dev-secret",
-);
+
+// Clé de signature des sessions. Pas de valeur par défaut : si AUTH_SECRET
+// n'est pas défini, on échoue au lieu d'accepter des jetons forgeables.
+function secretKey(): Uint8Array {
+  const s = process.env.AUTH_SECRET;
+  if (!s) {
+    throw new Error(
+      "AUTH_SECRET manquant : variable d'environnement requise pour les sessions.",
+    );
+  }
+  return new TextEncoder().encode(s);
+}
 
 export async function hashPassword(plain: string): Promise<string> {
   return bcrypt.hash(plain, 10);
@@ -25,7 +34,7 @@ export async function createSession(userId: string): Promise<void> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("60d")
-    .sign(secret);
+    .sign(secretKey());
 
   const store = await cookies();
   store.set(COOKIE, token, {
@@ -47,7 +56,9 @@ async function getUserId(): Promise<string | null> {
   const token = store.get(COOKIE)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, secretKey(), {
+      algorithms: ["HS256"],
+    });
     return (payload.userId as string) ?? null;
   } catch {
     return null;
